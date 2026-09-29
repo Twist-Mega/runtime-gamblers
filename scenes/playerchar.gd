@@ -30,6 +30,7 @@ func process_animation(direction) -> void:
 	else:
 		play_animation("default", direction)
 
+# Test comment
 func play_animation(prefix: String, dir: Vector2) -> void:
 	if dir.x > 0:
 		animated_sprite_2d.flip_h = dir.x < 0
