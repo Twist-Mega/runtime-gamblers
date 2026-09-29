@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://cm8t1fxw4iahv" path="res://assets/sprites/playerchar/Player.png" id="1_hgxel"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8vxo5"]
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_nb4sn"]
 atlas = ExtResource("1_hgxel")
 region = Rect2(0, 0, 32, 32)
@@ -112,7 +114,8 @@ animations = [{
 motion_mode = 1
 
 [node name="collision" type="CollisionShape2D" parent="." unique_id=383956929]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_8vxo5")
 
 [node name="sprite" type="AnimatedSprite2D" parent="." unique_id=942967643]
 sprite_frames = SubResource("SpriteFrames_q8omh")
-animation = &"move_right"
