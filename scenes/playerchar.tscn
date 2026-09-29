@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://jbq3nutsdqy3"]
 
 [ext_resource type="Texture2D" uid="uid://cm8t1fxw4iahv" path="res://assets/sprites/playerchar/Player.png" id="1_hgxel"]
+[ext_resource type="Script" uid="uid://bnejhvgx0nssa" path="res://scenes/playerchar.gd" id="1_nb4sn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8vxo5"]
 
@@ -112,6 +113,7 @@ animations = [{
 
 [node name="PlayerChar" type="CharacterBody2D" unique_id=1545327943]
 motion_mode = 1
+script = ExtResource("1_nb4sn")
 
 [node name="collision" type="CollisionShape2D" parent="." unique_id=383956929]
 position = Vector2(0, -1)
