@@ -3,7 +3,7 @@ extends CharacterBody2D
 
 const SPEED = 300.0
 
-@onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
+@onready var animated_sprite_2d: AnimatedSprite2D = $sprite
 
 func _physics_process(delta: float) -> void:
 	process_movement()
@@ -28,14 +28,18 @@ func process_animation(direction) -> void:
 	if velocity != Vector2.ZERO:
 		play_animation("move_", direction)
 	else:
-		play_animation("default", direction)
+		animated_sprite_2d.play("default")
 
-# Test comment
 func play_animation(prefix: String, dir: Vector2) -> void:
 	if dir.x > 0:
-		animated_sprite_2d.flip_h = dir.x < 0
+		animated_sprite_2d.flip_h = false
+		animated_sprite_2d.play(prefix + "right")
+	elif dir.x < 0:
+		animated_sprite_2d.flip_h = true
 		animated_sprite_2d.play(prefix + "right")
 	elif dir.y < 0:
+		animated_sprite_2d.flip_h = false
 		animated_sprite_2d.play(prefix + "up")
 	elif dir.y > 0:
+		animated_sprite_2d.flip_h = false
 		animated_sprite_2d.play(prefix + "down")
