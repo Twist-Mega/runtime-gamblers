@@ -23,11 +23,6 @@ size = Vector2(168, 20)
 [node name="Camera2D" type="Camera2D" parent="." unique_id=937758286]
 position = Vector2(64, 36)
 
-[node name="control instructions" type="Label" parent="." unique_id=2126526883]
-offset_right = 40.0
-offset_bottom = 23.0
-text = "use WASD/Arrow Keys to move"
-
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=353490107]
 
 [node name="poker_table_UI" type="ColorRect" parent="UI_layer" unique_id=780809914]
@@ -47,10 +42,10 @@ script = ExtResource("1_sugp2")
 
 [node name="Label" type="Label" parent="UI_layer/poker_table_UI" unique_id=390871759]
 layout_mode = 0
-offset_right = 215.84158
-offset_bottom = 122.77227
-scale = Vector2(0.505, 0.505)
-text = "Poker ui goes here
+offset_right = 214.0
+offset_bottom = 124.0
+scale = Vector2(0.5, 0.5)
+text = "Poker UI goes here
 
 press c to exit"
 horizontal_alignment = 1
@@ -73,10 +68,10 @@ script = ExtResource("1_tbgi4")
 
 [node name="Label" type="Label" parent="UI_layer/bar_UI" unique_id=1726390561]
 layout_mode = 0
-offset_right = 215.84158
-offset_bottom = 122.77227
-scale = Vector2(0.505, 0.505)
-text = "Bar ui goes here
+offset_right = 214.0
+offset_bottom = 124.0
+scale = Vector2(0.5, 0.5)
+text = "Bar UI goes here
 
 press c to exit"
 horizontal_alignment = 1
@@ -87,6 +82,21 @@ offset_right = 128.0
 offset_bottom = 72.0
 color = Color(0.2453543, 0.1213244, 0.0080458615, 1)
 metadata/_edit_use_anchors_ = true
+
+[node name="control instructions" type="Label" parent="." unique_id=2126526883]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 62.0
+offset_right = 584.0
+offset_bottom = 82.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 8
+text = "Z - menu | X - interact | C - cancel"
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=2130932207]
 
@@ -117,5 +127,5 @@ scale = Vector2(0.315, 0.315)
 table_ui = NodePath("../UI_layer/poker_table_UI")
 
 [node name="PlayerBody" parent="." unique_id=1525660655 instance=ExtResource("1_0wfyh")]
-position = Vector2(44, 53.999996)
-scale = Vector2(0.305, 0.305)
+position = Vector2(47, 49)
+scale = Vector2(0.4, 0.4)
