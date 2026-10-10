@@ -2,10 +2,12 @@
 
 [ext_resource type="PackedScene" uid="uid://dj2834nx3adav" path="res://scenes/player_body.tscn" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://dlekrbogomwbn" path="res://scripts/poker_table_UI.gd" id="1_sugp2"]
+[ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar_UI.gd" id="1_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://bymjvu5pk5fo4" path="res://scenes/poker_table.tscn" id="2_sugp2"]
+[ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://scenes/bar.tscn" id="3_jyhfs"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
-size = Vector2(169, 20)
+size = Vector2(168, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_eojjc"]
 size = Vector2(20, 112)
@@ -14,13 +16,17 @@ size = Vector2(20, 112)
 size = Vector2(20, 112)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r6w8c"]
-size = Vector2(169, 20)
+size = Vector2(168, 20)
 
 [node name="Main" type="Node2D" unique_id=1142718075]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=937758286]
-position = Vector2(64.5, 36)
-zoom = Vector2(15, 15)
+position = Vector2(64, 36)
+
+[node name="control instructions" type="Label" parent="." unique_id=2126526883]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "use WASD/Arrow Keys to move"
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=353490107]
 
@@ -30,27 +36,54 @@ visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 31.0
-offset_top = 40.0
-offset_right = -671.0
-offset_bottom = -308.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0.5686275, 0.5058824, 1)
 script = ExtResource("1_sugp2")
 
-[node name="Label" type="Label" parent="UI_layer/poker_table_UI" unique_id=634573120]
+[node name="Label" type="Label" parent="UI_layer/poker_table_UI" unique_id=390871759]
 layout_mode = 0
-offset_right = 450.7826
-offset_bottom = 301.0
+offset_right = 215.84158
+offset_bottom = 122.77227
+scale = Vector2(0.505, 0.505)
 text = "Poker ui goes here
 
 press c to exit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="bar_UI" type="ColorRect" parent="UI_layer" unique_id=1509891427]
+process_mode = 2
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2051174, 0.20511746, 0.20511737, 1)
+script = ExtResource("1_tbgi4")
+
+[node name="Label" type="Label" parent="UI_layer/bar_UI" unique_id=1726390561]
+layout_mode = 0
+offset_right = 215.84158
+offset_bottom = 122.77227
+scale = Vector2(0.505, 0.505)
+text = "Bar ui goes here
+
+press c to exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Floor" type="ColorRect" parent="." unique_id=792804267]
-offset_right = 129.0
+offset_right = 128.0
 offset_bottom = 72.0
 color = Color(0.2453543, 0.1213244, 0.0080458615, 1)
 metadata/_edit_use_anchors_ = true
@@ -58,7 +91,7 @@ metadata/_edit_use_anchors_ = true
 [node name="Walls" type="StaticBody2D" parent="." unique_id=2130932207]
 
 [node name="top_wall" type="CollisionShape2D" parent="Walls" unique_id=360612364]
-position = Vector2(66, -10)
+position = Vector2(64, -10)
 shape = SubResource("RectangleShape2D_cjbcc")
 
 [node name="left_wall" type="CollisionShape2D" parent="Walls" unique_id=1180606478]
@@ -66,12 +99,17 @@ position = Vector2(-10, 36)
 shape = SubResource("RectangleShape2D_eojjc")
 
 [node name="right_wall" type="CollisionShape2D" parent="Walls" unique_id=1422995130]
-position = Vector2(139, 36)
+position = Vector2(138, 36)
 shape = SubResource("RectangleShape2D_p6n3s")
 
 [node name="bottom_wall" type="CollisionShape2D" parent="Walls" unique_id=1809424803]
-position = Vector2(65, 82)
+position = Vector2(64, 82)
 shape = SubResource("RectangleShape2D_r6w8c")
+
+[node name="Bar" parent="." unique_id=2054879803 node_paths=PackedStringArray("bar_ui") instance=ExtResource("3_jyhfs")]
+position = Vector2(10.999992, 12)
+scale = Vector2(1.220625, 1.220625)
+bar_ui = NodePath("../UI_layer/bar_UI")
 
 [node name="poker_table" parent="." unique_id=761407478 node_paths=PackedStringArray("table_ui") instance=ExtResource("2_sugp2")]
 position = Vector2(92, 28)

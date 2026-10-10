@@ -1,7 +1,7 @@
 class_name PlayerBody
 extends CharacterBody2D
 
-@export var speed: float = 200.0
+@export var speed: float = 80.0
 
 #Movement
 func _physics_process(_delta: float) -> void:
