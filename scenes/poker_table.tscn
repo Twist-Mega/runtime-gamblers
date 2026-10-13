@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://bymjvu5pk5fo4"]
+
+[ext_resource type="Texture2D" uid="uid://bfi14wyhx461e" path="res://assets/placeholder_poker_table.png" id="1_bx4wl"]
+[ext_resource type="Script" uid="uid://c5a21x33ckqyd" path="res://scripts/poker_table.gd" id="1_ox824"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_eojjc"]
+radius = 24.0
+height = 88.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cjbcc"]
+radius = 42.0
+height = 126.0
+
+[node name="poker_table" type="StaticBody2D" unique_id=761407478]
+script = ExtResource("1_ox824")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=696785735]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_eojjc")
+debug_color = Color(0.9835866, 0.12849551, 1.92523e-07, 0.41960785)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1927598047]
+position = Vector2(-0.5000005, 2.8750002)
+scale = Vector2(0.12890625, 0.11490885)
+texture = ExtResource("1_bx4wl")
+
+[node name="interact_zone" type="Area2D" parent="." unique_id=513597815]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="interact_zone" unique_id=455842815]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_cjbcc")
