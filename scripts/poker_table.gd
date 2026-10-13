@@ -1,7 +1,5 @@
 extends StaticBody2D
 
-#for table UI
-@export var table_ui: Control
 var player_in_range: bool = false
 
 func _ready() -> void:
@@ -22,4 +20,5 @@ func _on_body_exited(body: Node) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if player_in_range and event.is_action_pressed("interact"):
-		table_ui.open()
+		if GameState.request_state(GameState.State.TABLE):
+			get_viewport().set_input_as_handled()

@@ -116,15 +116,13 @@ shape = SubResource("RectangleShape2D_p6n3s")
 position = Vector2(64, 82)
 shape = SubResource("RectangleShape2D_r6w8c")
 
-[node name="Bar" parent="." unique_id=2054879803 node_paths=PackedStringArray("bar_ui") instance=ExtResource("3_jyhfs")]
+[node name="Bar" parent="." unique_id=2054879803 instance=ExtResource("3_jyhfs")]
 position = Vector2(10.999992, 12)
 scale = Vector2(1.220625, 1.220625)
-bar_ui = NodePath("../UI_layer/bar_UI")
 
-[node name="poker_table" parent="." unique_id=761407478 node_paths=PackedStringArray("table_ui") instance=ExtResource("2_sugp2")]
+[node name="poker_table" parent="." unique_id=761407478 instance=ExtResource("2_sugp2")]
 position = Vector2(92, 28)
 scale = Vector2(0.315, 0.315)
-table_ui = NodePath("../UI_layer/poker_table_UI")
 
 [node name="PlayerBody" parent="." unique_id=1525660655 instance=ExtResource("1_0wfyh")]
 position = Vector2(47, 49)
