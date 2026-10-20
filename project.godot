@@ -11,11 +11,7 @@ config_version=5
 [application]
 
 config/name="Runtime Gamblers"
-<<<<<<< HEAD
 run/main_scene="uid://c4a5isx0j3x2k"
-=======
-run/main_scene="uid://nubpoe4tk2hd"
->>>>>>> a8af75add6c51c6117ee848247ad545359e139e6
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
