@@ -16,7 +16,7 @@ const ALLOWED = {
 	State.EXPLORING: [State.MENU, State.TABLE, State.BAR],
 	State.MENU: [State.EXPLORING],
 	State.TABLE: [State.EXPLORING],
-	State.BAR: [State.EXPLORING, State.MENU]
+	State.BAR: [State.EXPLORING]
 }
 
 func request_state(new_state: State) -> bool:

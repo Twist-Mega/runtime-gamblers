@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar_UI.gd" id="1_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://bymjvu5pk5fo4" path="res://scenes/poker_table.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://scenes/bar.tscn" id="3_jyhfs"]
+[ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="3_tefeu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
 size = Vector2(168, 20)
@@ -74,6 +75,31 @@ scale = Vector2(0.5, 0.5)
 text = "Bar UI goes here
 
 press c to exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="pause_menu" type="ColorRect" parent="UI_layer" unique_id=1936512229]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2051174, 0.20511746, 0.20511737, 1)
+script = ExtResource("3_tefeu")
+
+[node name="Label" type="Label" parent="UI_layer/pause_menu" unique_id=1457202157]
+layout_mode = 0
+offset_right = 214.0
+offset_bottom = 124.0
+scale = Vector2(0.5, 0.5)
+text = "Game Paused
+(add functionality)"
 horizontal_alignment = 1
 vertical_alignment = 1
 
