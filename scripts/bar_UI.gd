@@ -1,14 +1,14 @@
 extends ColorRect
 
-func open() -> void:
-	visible = true
-	get_tree().paused = true
-
-func close() -> void:
+#listens for state change
+func _ready() -> void:
 	visible = false
-	get_tree().paused = false
-
+	GameState.state_changed.connect(_on_state_changed)
+	
+func _on_state_changed(new_state: int) -> void:
+	visible = (new_state == GameState.State.BAR)
+	
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event.is_action_pressed("cancel"):
-		close()
+	if GameState.state == GameState.State.BAR and event.is_action_pressed("cancel"):
+		GameState.request_state(GameState.State.EXPLORING)
 		get_viewport().set_input_as_handled()
