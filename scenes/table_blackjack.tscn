@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://nfnd2xup6qo0"]
+
+[ext_resource type="Texture2D" uid="uid://ryf4frqyddju" path="res://assets/props/prop_blackjacktable.png" id="1_ht4xr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hoypx"]
+size = Vector2(39, 19)
+
+[node name="Node2D" type="Node2D" unique_id=690257170]
+
+[node name="TableBlackjack" type="StaticBody2D" parent="." unique_id=771942175]
+position = Vector2(-2, -2)
+
+[node name="Sprite2D" type="Sprite2D" parent="TableBlackjack" unique_id=408653145]
+scale = Vector2(1.28, 1.28)
+texture = ExtResource("1_ht4xr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TableBlackjack" unique_id=569854597]
+position = Vector2(-0.5, -0.5)
+shape = SubResource("RectangleShape2D_hoypx")
