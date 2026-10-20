@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dpsoxfbqhyqrf"]
+
+[ext_resource type="Script" uid="uid://dh7s1dpbenp6q" path="res://scripts/bar.gd" id="1_5dekh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
+size = Vector2(10, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eojjc"]
+size = Vector2(12.5, 47)
+
+[node name="Bar" type="StaticBody2D" unique_id=2054879803]
+script = ExtResource("1_5dekh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1450468392]
+position = Vector2(5, 20)
+shape = SubResource("RectangleShape2D_cjbcc")
+debug_color = Color(0.97502905, 0.10495254, 0.30829582, 0.41960785)
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=359371439]
+offset_right = 10.0
+offset_bottom = 40.0
+color = Color(0.20751238, 0.20751238, 0.20751238, 1)
+
+[node name="interact_zone" type="Area2D" parent="." unique_id=2113869443]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="interact_zone" unique_id=102858968]
+position = Vector2(9.25, 20)
+shape = SubResource("RectangleShape2D_eojjc")
