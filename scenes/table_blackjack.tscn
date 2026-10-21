@@ -6,7 +6,7 @@
 size = Vector2(39, 19)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
-size = Vector2(17, 9.75)
+size = Vector2(17, 8.75)
 
 [node name="Node2D" type="Node2D" unique_id=690257170]
 
@@ -24,5 +24,6 @@ shape = SubResource("RectangleShape2D_hoypx")
 [node name="interact_zone" type="Area2D" parent="." unique_id=2090079226]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="interact_zone" unique_id=918273315]
-position = Vector2(-2, 9.125)
+position = Vector2(-2, 8.625)
+rotation = 1.6581786
 shape = SubResource("RectangleShape2D_cjbcc")

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dlekrbogomwbn" path="res://scripts/blackjack/blackjack_table_UI.gd" id="1_sugp2"]
 [ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar/bar_UI.gd" id="1_tbgi4"]
 [ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="3_tefeu"]
-[ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://OLD_bar.tscn" id="4_dhe47"]
+[ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://OBSOLETE/OLD_bar.tscn" id="4_dhe47"]
 [ext_resource type="PackedScene" uid="uid://bymjvu5pk5fo4" path="res://OBSOLETE/OLD_table.tscn" id="5_fbiu4"]
 [ext_resource type="PackedScene" uid="uid://dj2834nx3adav" path="res://OBSOLETE/OLD_player.tscn" id="6_65ejc"]
 
@@ -145,12 +145,10 @@ shape = SubResource("RectangleShape2D_r6w8c")
 [node name="Bar" parent="." unique_id=2054879803 instance=ExtResource("4_dhe47")]
 position = Vector2(10.999992, 12)
 scale = Vector2(1.220625, 1.220625)
-script = null
 
 [node name="poker_table" parent="." unique_id=761407478 instance=ExtResource("5_fbiu4")]
 position = Vector2(92, 28)
 scale = Vector2(0.315, 0.315)
-script = null
 
 [node name="PlayerBody" parent="." unique_id=1525660655 instance=ExtResource("6_65ejc")]
 position = Vector2(47, 49)
