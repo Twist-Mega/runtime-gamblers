@@ -214,6 +214,7 @@ scale = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_a6ker")
 
 [node name="Camera2D" type="Camera2D" parent="Main_Char" unique_id=507962369]
+position_smoothing_enabled = true
 
 [node name="NPCS" type="Node2D" parent="." unique_id=216817904]
 
