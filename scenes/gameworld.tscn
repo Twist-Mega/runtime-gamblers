@@ -95,6 +95,7 @@ scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2043583348]
+enabled = false
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
 
@@ -211,6 +212,9 @@ offset = Vector2(0, -12)
 position = Vector2(8, 6)
 scale = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_a6ker")
+
+[node name="Camera2D" type="Camera2D" parent="Main_Char" unique_id=507962369]
+position_smoothing_enabled = true
 
 [node name="NPCS" type="Node2D" parent="." unique_id=216817904]
 
