@@ -1,6 +1,6 @@
-[gd_resource type="SpriteFrames" format=3 uid="uid://bvr2n4iwte81r"]
+[gd_resource type="SpriteFrames" format=3 uid="uid://gvhq7bichpmy"]
 
-[ext_resource type="Texture2D" uid="uid://d1kppbxyn4wqi" path="res://assets/characters/char_player_walk.png" id="1_dy3qb"]
+[ext_resource type="Texture2D" uid="uid://bvx63ymwehe6w" path="res://assets/characters/char_player_walk.png" id="1_dy3qb"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8repx"]
 atlas = ExtResource("1_dy3qb")
@@ -109,7 +109,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_side_right",
-"speed": 6.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,

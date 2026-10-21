@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Runtime Gamblers"
-run/main_scene="uid://nubpoe4tk2hd"
+run/main_scene="uid://c4a5isx0j3x2k"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -33,9 +33,13 @@ window/stretch/scale_mode="integer"
 
 project/assembly_name="Runtime Gamblers"
 
+[global_group]
+
+player=""
+
 [gui]
 
-theme/custom_font="uid://b4rudpb08fwup"
+theme/custom_font="uid://cccpkref0tdc"
 
 [input]
 

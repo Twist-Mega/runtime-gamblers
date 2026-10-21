@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://nubpoe4tk2hd"]
 
-[ext_resource type="PackedScene" uid="uid://dj2834nx3adav" path="res://scenes/player_body.tscn" id="1_0wfyh"]
-[ext_resource type="Script" uid="uid://dlekrbogomwbn" path="res://scripts/poker_table_UI.gd" id="1_sugp2"]
-[ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar_UI.gd" id="1_tbgi4"]
-[ext_resource type="PackedScene" uid="uid://bymjvu5pk5fo4" path="res://scenes/poker_table.tscn" id="2_sugp2"]
-[ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://scenes/bar.tscn" id="3_jyhfs"]
+[ext_resource type="Script" uid="uid://dlekrbogomwbn" path="res://scripts/blackjack/blackjack_table_UI.gd" id="1_sugp2"]
+[ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar/bar_UI.gd" id="1_tbgi4"]
 [ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="3_tefeu"]
+[ext_resource type="PackedScene" uid="uid://dpsoxfbqhyqrf" path="res://OBSOLETE/OLD_bar.tscn" id="4_dhe47"]
+[ext_resource type="PackedScene" uid="uid://bymjvu5pk5fo4" path="res://OBSOLETE/OLD_table.tscn" id="5_fbiu4"]
+[ext_resource type="PackedScene" uid="uid://dj2834nx3adav" path="res://OBSOLETE/OLD_player.tscn" id="6_65ejc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
 size = Vector2(168, 20)
@@ -142,14 +142,14 @@ shape = SubResource("RectangleShape2D_p6n3s")
 position = Vector2(64, 82)
 shape = SubResource("RectangleShape2D_r6w8c")
 
-[node name="Bar" parent="." unique_id=2054879803 instance=ExtResource("3_jyhfs")]
+[node name="Bar" parent="." unique_id=2054879803 instance=ExtResource("4_dhe47")]
 position = Vector2(10.999992, 12)
 scale = Vector2(1.220625, 1.220625)
 
-[node name="poker_table" parent="." unique_id=761407478 instance=ExtResource("2_sugp2")]
+[node name="poker_table" parent="." unique_id=761407478 instance=ExtResource("5_fbiu4")]
 position = Vector2(92, 28)
 scale = Vector2(0.315, 0.315)
 
-[node name="PlayerBody" parent="." unique_id=1525660655 instance=ExtResource("1_0wfyh")]
+[node name="PlayerBody" parent="." unique_id=1525660655 instance=ExtResource("6_65ejc")]
 position = Vector2(47, 49)
 scale = Vector2(0.4, 0.4)

@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends Node2D
 
 var player_in_range: bool = false
 
