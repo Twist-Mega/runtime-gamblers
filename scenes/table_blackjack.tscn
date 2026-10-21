@@ -25,5 +25,4 @@ shape = SubResource("RectangleShape2D_hoypx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="interact_zone" unique_id=918273315]
 position = Vector2(-2, 8.625)
-rotation = 1.6581786
 shape = SubResource("RectangleShape2D_cjbcc")
