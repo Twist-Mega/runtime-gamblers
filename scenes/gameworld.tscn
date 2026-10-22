@@ -94,8 +94,6 @@ position = Vector2(2.9999926, -76.99998)
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2043583348]
-
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
 
 [node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
@@ -220,6 +218,13 @@ offset = Vector2(0, -12)
 position = Vector2(8, 6)
 scale = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_a6ker")
+
+[node name="Camera2D" type="Camera2D" parent="Main_Char" unique_id=507962369]
+limit_left = -224
+limit_top = -220
+limit_right = 224
+limit_bottom = 83
+position_smoothing_enabled = true
 
 [node name="NPCS" type="Node2D" parent="." unique_id=216817904]
 
