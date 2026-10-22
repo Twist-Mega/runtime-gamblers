@@ -94,10 +94,6 @@ position = Vector2(2.9999926, -76.99998)
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2043583348]
-visible = false
-enabled = false
-
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
 
 [node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
