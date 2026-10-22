@@ -27,15 +27,27 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_c2y4s")
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer" unique_id=569066654]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/MarginContainer" unique_id=1082527049]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer" unique_id=1856812091]
+[node name="Text" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer" unique_id=1856812091]
+custom_minimum_size = Vector2(175, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_override_fonts/font = ExtResource("1_rc1id")
-text = "Lorem ipsum"
+theme_override_font_sizes/font_size = 11
+text = "All your base are belong to us."
+autowrap_mode = 3
+
+[node name="Advance" type="Label" parent="MarginContainer/MarginContainer/HBoxContainer" unique_id=977451806]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("1_rc1id")
+theme_override_font_sizes/font_size = 11
+text = "$"
