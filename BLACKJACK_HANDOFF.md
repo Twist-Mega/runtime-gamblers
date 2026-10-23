@@ -6,9 +6,9 @@ This describes the current working files; check `git status` before editing.
 ## Scope and current work
 
 - Project: Runtime Gamblers, Godot 4.7 / GDScript (`.gd`), not Python.
-- Branch: `blackjack`. Development, gameworld/wallet integration, and the wallet
-  HUD are committed and pushed. The per-table 5/10/20 stakes and these
-  documentation updates are currently uncommitted; inspect `git status` before proceeding.
+- Branch: `blackjack`. Development, gameworld/wallet integration, the wallet
+  HUD, and per-table 5/10/20 stakes are committed and pushed. Inspect
+  `git status` before proceeding to confirm any newer local changes.
 - Work in small, explicitly approved pieces. Explain the proposed changes and
   ask before implementing the next piece or batch. Do not expand the scope.
 - Only the right-side tables have blackjack interaction and UI. Do not add
