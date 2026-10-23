@@ -2,9 +2,13 @@
 
 [ext_resource type="Texture2D" uid="uid://co7kqj3wnc7ws" path="res://assets/RuntimeGamblersMap.jpg" id="2_8repx"]
 [ext_resource type="Texture2D" uid="uid://ddt8wonfwyvyh" path="res://assets/tiles/tile_casino_room.png" id="2_8vxo5"]
+[ext_resource type="Script" uid="uid://dlekrbogomwbn" path="res://scripts/blackjack/blackjack_table_UI.gd" id="3_sr1yb"]
 [ext_resource type="SpriteFrames" uid="uid://gvhq7bichpmy" path="res://assets/characters/char_player_walk.tres" id="4_8repx"]
-[ext_resource type="Script" uid="uid://bnejhvgx0nssa" path="res://scenes/playerchar.gd" id="4_uqaac"]
+[ext_resource type="Script" uid="uid://bnejhvgx0nssa" path="res://scripts/playerchar.gd" id="4_uqaac"]
+[ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar/bar_UI.gd" id="4_wrnkp"]
+[ext_resource type="Script" uid="uid://c5a21x33ckqyd" path="res://scripts/blackjack/blackjack_table.gd" id="4_ygfup"]
 [ext_resource type="PackedScene" uid="uid://nfnd2xup6qo0" path="res://scenes/table_blackjack.tscn" id="5_8repx"]
+[ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="5_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
@@ -90,7 +94,93 @@ position = Vector2(2.9999926, -76.99998)
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2043583348]
+[node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
+
+[node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
+process_mode = 2
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.5686275, 0.5058824, 1)
+script = ExtResource("3_sr1yb")
+
+[node name="Label" type="Label" parent="UI_layer/blackjack_table_UI" unique_id=2010612573]
+layout_mode = 0
+offset_right = 214.0
+offset_bottom = 124.0
+scale = Vector2(0.5, 0.5)
+text = "Blackjack UI goes here
+
+press c to exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="bar_UI" type="ColorRect" parent="UI_layer" unique_id=2018191039]
+process_mode = 2
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2051174, 0.20511746, 0.20511737, 1)
+script = ExtResource("4_wrnkp")
+
+[node name="Label" type="Label" parent="UI_layer/bar_UI" unique_id=2013525097]
+layout_mode = 0
+offset_right = 214.0
+offset_bottom = 124.0
+scale = Vector2(0.5, 0.5)
+text = "Bar UI goes here
+
+press c to exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="pause_menu" type="ColorRect" parent="UI_layer" unique_id=778600310]
+process_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = -11.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2051174, 0.20511746, 0.20511737, 1)
+script = ExtResource("5_28lvv")
+
+[node name="Label" type="Label" parent="UI_layer/pause_menu" unique_id=1743739260]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 22.0
+offset_right = 366.0
+offset_bottom = 146.0
+scale = Vector2(0.5, 0.5)
+text = "Game Paused
+
+money:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MoneyLabel" type="Label" parent="UI_layer/pause_menu" unique_id=1040020934]
+layout_mode = 0
+offset_left = 116.0
+offset_top = 71.0
+offset_right = 156.0
+offset_bottom = 87.0
 
 [node name="BlackjackTables" parent="." unique_id=690257170 instance=ExtResource("5_8repx")]
 position = Vector2(-86, 54)
@@ -103,14 +193,17 @@ position = Vector2(0, -191)
 
 [node name="21BottomRight" parent="BlackjackTables" unique_id=1928121491 instance=ExtResource("5_8repx")]
 position = Vector2(176, 0)
+script = ExtResource("4_ygfup")
 
 [node name="21MiddleRight" parent="BlackjackTables" unique_id=1577435322 instance=ExtResource("5_8repx")]
 position = Vector2(176, -96)
+script = ExtResource("4_ygfup")
 
 [node name="21TopRight" parent="BlackjackTables" unique_id=111689003 instance=ExtResource("5_8repx")]
 position = Vector2(176, -192)
+script = ExtResource("4_ygfup")
 
-[node name="Main_Char" type="CharacterBody2D" parent="." unique_id=1975199492]
+[node name="Main_Char" type="CharacterBody2D" parent="." unique_id=1975199492 groups=["player"]]
 position = Vector2(-8, 66)
 disable_mode = 1
 script = ExtResource("4_uqaac")
@@ -125,6 +218,13 @@ offset = Vector2(0, -12)
 position = Vector2(8, 6)
 scale = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_a6ker")
+
+[node name="Camera2D" type="Camera2D" parent="Main_Char" unique_id=507962369]
+limit_left = -224
+limit_top = -220
+limit_right = 224
+limit_bottom = 83
+position_smoothing_enabled = true
 
 [node name="NPCS" type="Node2D" parent="." unique_id=216817904]
 
