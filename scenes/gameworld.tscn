@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://nfnd2xup6qo0" path="res://scenes/table_blackjack.tscn" id="5_8repx"]
 [ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="5_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
+[ext_resource type="Script" path="res://scripts/wallet_hud.gd" id="7_wallet_hud"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
 resource_name = "Casino Sheet"
@@ -95,6 +96,21 @@ scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
+
+[node name="WalletAmount" type="Label" parent="UI_layer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 3.0
+offset_right = -4.0
+offset_bottom = 19.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.8431373, 0, 1)
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 2
+script = ExtResource("7_wallet_hud")
 
 [node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
 process_mode = 2
