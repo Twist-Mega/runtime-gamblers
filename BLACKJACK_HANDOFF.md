@@ -71,8 +71,8 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
 - One selected stake per session; default limit five rounds. Deduct one human
   stake per round, never all five upfront. Leaving is allowed before play or
   between completed table rounds. Standalone debug waits for summary
-  acknowledgement. Gameworld play automatically closes the session and hands
-  its summary to the green popup instead.
+  acknowledgement. Gameworld play waits for Close Session after the fifth hand
+  or insufficient funds; Leave Table returns directly to the green summary popup.
 - Human settlement and **whole-table completion are separate**. An early result
   can credit chips/count the human hand while AI still play. Next Hand, Leave,
   and session completion wait for the whole table and any pending payment.
@@ -93,8 +93,9 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
   Both Play and Play Again check affordability against the selected stake.
 - Play does not charge money. Each Start Hand deducts one stake; payouts use the
   same balance shown in the game's pause menu. Play Again never resets money.
-- Leave Table, the five-hand limit, or insufficient funds automatically removes
-  the blackjack overlay and returns to the green popup. It shows Hands, Start,
+- After final-round playback finishes (hand limit or insufficient funds), Close
+  Session appears; the final cards and result remain visible until clicked. Leave Table removes
+  the blackjack overlay directly and returns to the green popup. It shows Hands, Start,
   End, and Net, plus Play Again. Play Again is disabled below the required stake.
 - Leaving before the first hand shows a zero-hand summary without a charge.
 - The world stays paused while blackjack or the green summary is open. C closes
@@ -102,7 +103,8 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
 - The overlay's temporary scaling is restored before showing the green popup.
   The left tables, project resolution, camera, and movement scripts are unchanged.
 - Gameworld play hides Next deal, Fail next return once, Reset test money,
-  New Session, the Testing tools heading, and the separate Close Session button.
+  New Session, and the Testing tools heading. Close Session stays hidden until
+  final-round playback finishes, then returns to the green summary when clicked.
   Standalone debug keeps its tools and its own 1,000 fake-money balance.
 - Retry Return remains visible but disabled except during pending payments.
   No genuine payout failures have been observed; fake-wallet tests inject them.
@@ -124,7 +126,8 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
   changes after the view enters the tree. Standalone debug defaults to stake 5.
   Gameworld sets `manage_window_scaling` and `return_summary_to_host` to true
   and listens for `session_closed(summary)` with a deferred connection. The view
-  acknowledges COMPLETE internally in this mode, after ordered playback finishes.
+  acknowledges COMPLETE internally after playback only for `player_left` or
+  `cancelled`. Other endings wait for the player's Close Session click.
 - Pass table configuration explicitly: `{max_hands, ai_seats, stake_options}`.
   Debug configuration uses a fixed stake 5, selected automatically. The controller's legacy
   fallback table uses stake **2 and no AI**; do not assume its defaults match the demo.
@@ -165,7 +168,7 @@ For each accepted command, play its events **in order**:
 | `seat_settled` | Show that seat's outcome, including the human's early bust/blackjack. |
 | `wallet_transaction` | Update the displayed balance/animate human chips. Money is already handled by the session. |
 | `round_finished` | Present the finished table. Allow next-round actions only when the session permits them. |
-| `session_finished` / `session_closed` | Standalone summary/acknowledgement, or automatic return to the gameworld's green summary popup. |
+| `session_finished` / `session_closed` | Completion followed by acknowledgement; gameworld waits for Close Session at the hand limit or insufficient funds and returns directly for Leave Table. |
 
 The response snapshot is the state **after the entire command**, sometimes after
 several dealer draws. Do not render it before its event animations: that could
@@ -197,7 +200,9 @@ and final artwork remain future work. The engine/session do not change scenes.
 - **Test:** open `tests/blackjack/blackjack_tests.tscn`, press **F6**, read Output.
   It runs automated tests and closes; it is not the playable scene.
 - Last verified suites: engine **42 tests / 6391 checks**, session **42 / 724**,
-  display **21 / 280**, all passing. Tests cover populated-table bounds during
+  display **24 / 336**, all passing. Hosted tests cover acknowledgement after
+  the fifth hand or insufficient funds, and direct return on Leave Table.
+  Tests cover populated-table bounds during
   dealing/hitting/settlement, standalone scaling/restoration,
   embedded host settings, automatic stake selection,
   insufficient starting funds, shared-deck order, manual input,

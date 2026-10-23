@@ -147,7 +147,7 @@ func _build_ui() -> void:
 		var button := _button(entry[1], actions, _request.bind(entry[0]))
 		button.name = entry[0]
 		_buttons[entry[0]] = button
-	_buttons.acknowledge_result.visible = not return_summary_to_host
+	_buttons.acknowledge_result.visible = false
 	_buttons.open_blackjack.visible = _provided_wallet == null
 	_build_seat("dealer", "Dealer", content)
 	var table := HBoxContainer.new()
@@ -284,7 +284,7 @@ func _request(action: String) -> void:
 		await _play_events(response.events)
 		_state = response.state
 		_refresh_view()
-		if return_summary_to_host and response.accepted and _state.phase == "COMPLETE":
+		if return_summary_to_host and response.accepted and _state.phase == "COMPLETE" and _state.summary.reason in ["player_left", "cancelled"]:
 			response = _session.acknowledge_result()
 			continue
 		if response.accepted and _state.phase == "SELECTING_STAKE":
@@ -458,6 +458,7 @@ func _sync_controls() -> void:
 	var legal: Array = _state.get("legal_actions", [])
 	for action in _buttons:
 		_buttons[action].disabled = _busy or action not in legal
+	_buttons.acknowledge_result.visible = not _busy and "acknowledge_result" in legal
 	_buttons.start_next_hand.text = "Start Hand" if _state.get("hand_number", 0) == 0 else "Next Hand"
 	_mode.disabled = _provided_wallet != null or _busy or _state.get("phase") not in ["SELECTING_STAKE", "READY", "BETWEEN_HANDS", "CLOSED"]
 	_reset_button.disabled = _provided_wallet != null or _busy

@@ -39,8 +39,9 @@ func _equal(actual: Variant, expected: Variant, message: String) -> void:
 	_check(actual == expected, "%s (expected %s, got %s)" % [message, str(expected), str(actual)])
 
 
-func _view(balance: int = 1000, delay: float = 0.0, seats: Array = []) -> Control:
+func _view(balance: int = 1000, delay: float = 0.0, seats: Array = [], hosted: bool = false) -> Control:
 	var view: Control = DebugScene.instantiate()
+	view.return_summary_to_host = hosted
 	view.starting_balance = balance
 	view.deal_delay = delay
 	view.ai_first_move_delay = delay
@@ -216,6 +217,70 @@ func test_all_five_hands_summary_and_new_session() -> bool:
 	_equal(view._state.hand_number, 0, "New hand count")
 	_equal(view._card_rows.player.get_child_count(), 0, "Old cards cleared")
 	_equal(view._summary_label.visible, false, "Old summary cleared")
+	await _dispose(view)
+	return true
+
+
+func test_hosted_fifth_hand_waits_for_close_session() -> bool:
+	var view: Control = await _view(1000, 0.001, [], true)
+	var closed: Array = []
+	view.session_closed.connect(func(summary: Dictionary): closed.append(summary))
+	view._mode.select(3)
+	_check(not view._buttons.acknowledge_result.visible, "Close Session hidden before play")
+	for hand_number in range(1, 6):
+		await _press(view, "start_next_hand")
+		_check(not view._buttons.acknowledge_result.visible, "Close Session hidden during hand")
+		view._buttons.stand.pressed.emit()
+		_check(view._busy, "Final result playback is asynchronous")
+		_check(not view._buttons.acknowledge_result.visible, "Close Session hidden during result playback")
+		await _idle(view)
+		_equal(view._buttons.acknowledge_result.visible, hand_number == 5, "Close Session appears only after fifth hand settles")
+	_equal(view._state.phase, "COMPLETE", "Hosted fifth hand waits for acknowledgement")
+	_equal(closed.size(), 0, "Host has not received a close signal")
+	_check(view._result_label.text.contains("PUSH"), "Final result remains visible")
+	_check(view._card_rows.player.get_child_count() > 0, "Final cards remain visible")
+	await _press(view, "acknowledge_result")
+	_equal(closed.size(), 1, "Close Session returns summary to host once")
+	_equal(closed[0].hands_played, 5, "Host receives all five hands")
+	_equal(view._state.phase, "CLOSED", "Session closes on button press")
+	await _dispose(view)
+	return true
+
+
+func test_hosted_insufficient_funds_waits_for_close_session() -> bool:
+	var view: Control = await _view(5, 0.001, ["left_2", "left_1", "right_1", "right_2"], true)
+	var closed: Array = []
+	view.session_closed.connect(func(summary: Dictionary): closed.append(summary))
+	view._mode.select(2)
+	await _press(view, "start_next_hand")
+	_equal(view._state.balance, 0, "Last stake spends remaining balance")
+	_check(not view._buttons.acknowledge_result.visible, "Zero balance during play does not show Close Session")
+	view._buttons.hit.pressed.emit()
+	_check(view._busy, "Remaining table plays after player bust")
+	_check(not view._buttons.acknowledge_result.visible, "Close Session hidden until whole round finishes")
+	await _idle(view)
+	_equal(view._state.phase, "COMPLETE", "Insufficient funds waits for acknowledgement")
+	_equal(view._state.summary.reason, "insufficient_funds", "Session ends because next stake is unaffordable")
+	_equal(closed.size(), 0, "Host does not close overlay automatically")
+	_check(view._buttons.acknowledge_result.visible, "Close Session appears after round settles")
+	_check(view._result_label.text.contains("LOSS"), "Final loss stays visible")
+	_check(view._card_rows.player.get_child_count() > 0, "Final cards stay visible")
+	await _press(view, "acknowledge_result")
+	_equal(closed.size(), 1, "Close Session returns summary to host once")
+	_equal(closed[0].hands_played, 1, "Summary includes the completed round")
+	_equal(closed[0].ending_balance, 0, "Summary includes exhausted wallet balance")
+	_equal(view._state.phase, "CLOSED", "Session closes on button press")
+	await _dispose(view)
+	return true
+
+
+func test_hosted_leave_still_returns_directly() -> bool:
+	var view: Control = await _view(1000, 0.0, [], true)
+	var closed: Array = []
+	view.session_closed.connect(func(summary: Dictionary): closed.append(summary))
+	await _press(view, "leave_table")
+	_equal(view._state.phase, "CLOSED", "Leave Table still closes hosted session directly")
+	_equal(closed.size(), 1, "Leave Table returns summary to host")
 	await _dispose(view)
 	return true
 

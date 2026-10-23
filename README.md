@@ -23,8 +23,10 @@ Final artwork and saving money across application launches remain future work.
 2. Approach a **right-side blackjack table** and press **X** to open the green popup.
 3. Check the stake shown in the popup, then click **Play** and **Start Hand**.
 4. Use **Hit** or **Stand**, then **Next Hand** to continue.
-5. **Leave Table**, five completed hands, or insufficient funds returns you to
-   the green popup with a summary: **Hands, Start, End, and Net**.
+5. After the fifth hand, or a round that leaves you unable to afford another hand,
+   review its cards and result, then click
+   **Close Session** to return to the green summary: **Hands, Start, End, and Net**.
+   **Leave Table** still returns you directly to that popup.
 6. Choose **Play Again** to start a new session with the current balance, or
    press **C** on the green popup to resume exploring.
 
@@ -83,7 +85,7 @@ Currently, successful output ends with:
 ```text
 Blackjack: 42 tests, 6391 checks, 0 failures.
 Blackjack sessions: 42 tests, 724 checks, 0 failures.
-Blackjack display: 21 tests, 280 checks, 0 failures.
+Blackjack display: 24 tests, 336 checks, 0 failures.
 Blackjack tests: ALL SUITES PASSED.
 ```
 
