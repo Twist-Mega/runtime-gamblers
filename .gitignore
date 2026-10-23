@@ -1,4 +1,4 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-/addons/godot-git-plugin/windows/~libgit_plugin.windows.editor.x86_64.dll
+/addons/godot-git-plugin/windows/~libgit_plugin.windows.editor.x86_64.dll*

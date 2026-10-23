@@ -1,5 +1,10 @@
 extends Node2D
 
+signal table_selected(table_id: String, stake_amount: int)
+
+@export var table_id: String = ""
+@export var stake_amount: int = 5
+
 var player_in_range: bool = false
 
 func _ready() -> void:
@@ -21,4 +26,5 @@ func _on_body_exited(body: Node) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if player_in_range and event.is_action_pressed("interact"):
 		if GameState.request_state(GameState.State.TABLE):
+			table_selected.emit(table_id, stake_amount)
 			get_viewport().set_input_as_handled()
