@@ -6,9 +6,9 @@ This describes the current working files; check `git status` before editing.
 ## Scope and current work
 
 - Project: Runtime Gamblers, Godot 4.7 / GDScript (`.gd`), not Python.
-- Branch: `blackjack`. Development and the display scaling fixes are committed
-  and pushed. The approved wallet/gameworld integration and these documentation
-  updates are currently uncommitted; inspect `git status` before proceeding.
+- Branch: `blackjack`. Development, gameworld/wallet integration, and the wallet
+  HUD are committed and pushed. The per-table 5/10/20 stakes and these
+  documentation updates are currently uncommitted; inspect `git status` before proceeding.
 - Work in small, explicitly approved pieces. Explain the proposed changes and
   ask before implementing the next piece or batch. Do not expand the scope.
 - Only the right-side tables have blackjack interaction and UI. Do not add
@@ -16,8 +16,8 @@ This describes the current working files; check `git status` before editing.
 - The right-table green popup opens blackjack with the official Wallet. Leaving
   or reaching a session limit returns to that popup's summary and Play Again.
 - Display cleanup: removed the subtitle, stake-selection prompts/buttons, and
-  higher-stake unlock. The display shows `Stake: 5` and selects it automatically
-  on launch, New Session, and reset. Preserve gameplay during further UI changes.
+  higher-stake unlock. Standalone debug defaults to `Stake: 5`; gameworld play
+  selects and shows the configured table's stake automatically.
 
 ## Structure: rules, session, display
 
@@ -38,6 +38,7 @@ Command response -> ordered events -> visual playback -> final public snapshot
 | [blackjack_wallet_port.gd](scripts/blackjack/blackjack_wallet_port.gd) | Abstract wallet interface: `get_balance()` and `apply_transaction(id, delta)`. |
 | [game_wallet_adapter.gd](scripts/blackjack/game_wallet_adapter.gd) + [wallet.gd](scripts/wallet.gd) | Read and transact against the official game's balance. Successful transaction IDs are recorded in Wallet for its application lifetime. |
 | [blackjack_table_UI.gd](scripts/blackjack/blackjack_table_UI.gd) + [gameworld.tscn](scenes/gameworld.tscn) | Existing right-table popup, Play/Play Again, overlay lifecycle, green summary, and C exit. |
+| [blackjack_table.gd](scripts/blackjack/blackjack_table.gd) | Exports a table ID and stake; successful X interaction sends `table_selected` to the popup through scene signal connections. Attached only to right-side tables. |
 | [fake_wallet.gd](tests/blackjack/fake_wallet.gd) | Test-only balance and transaction ledger; supports simulated payment failures. |
 | [blackjack_debug.tscn](tests/blackjack/blackjack_debug.tscn) + [blackjack_debug.gd](tests/blackjack/blackjack_debug.gd) | Display reused for standalone debug and gameworld play. Accepts a supplied wallet; otherwise creates a fake wallet. Displays public cards, actions, results, and logs. |
 | `tests/blackjack/test_blackjack_*.gd` | Engine, session, and real debug-scene tests. |
@@ -82,7 +83,14 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
 ## Approved gameworld flow
 
 - F5, approach a right-side table, X, Play, Start Hand. Uses the official game
-  Wallet (100 on a fresh launch), stake 5, up to five hands, and four AI chairs.
+  Wallet (100 on a fresh launch), up to five hands, and four AI chairs.
+- Bottom-right stake is 5, middle-right is 10, top-right is 20. The node IDs are
+  `21BottomRight`, `21MiddleRight`, and `21TopRight`; their table IDs are
+  `blackjack_bottom_right`, `blackjack_middle_right`, and `blackjack_top_right`.
+  Edit each right-table instance's `table_id` and `stake_amount` in the Inspector.
+- The green popup receives the selected table ID/stake and shows its stake.
+  The session, displayed wager, payouts, and Play Again use those same settings.
+  Both Play and Play Again check affordability against the selected stake.
 - Play does not charge money. Each Start Hand deducts one stake; payouts use the
   same balance shown in the game's pause menu. Play Again never resets money.
 - Leave Table, the five-hand limit, or insufficient funds automatically removes
@@ -110,7 +118,10 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
 - Session: `open_blackjack(table_id)`, `select_stake(option_id)`,
   `start_next_hand(deck_order = [])`, `hit()`, `stand()`, `advance_table()`,
   `leave_table()`, `acknowledge_result()`, `retry_pending_transaction()`.
-- Display: call `configure_wallet(adapter)` before adding it to the tree.
+- Display: call `configure_wallet(adapter)` and
+  `configure_table(table_id, stake_amount)` before adding it to the tree.
+  Table configuration rejects empty IDs, nonpositive/oversized stakes, and
+  changes after the view enters the tree. Standalone debug defaults to stake 5.
   Gameworld sets `manage_window_scaling` and `return_summary_to_host` to true
   and listens for `session_closed(summary)` with a deferred connection. The view
   acknowledges COMPLETE internally in this mode, after ordered playback finishes.
@@ -198,6 +209,11 @@ and final artwork remain future work. The engine/session do not change scenes.
   insufficient-funds endings), and 15 testing-control visibility checks. Their
   helper scripts/logs are under ignored `.godot/`; they are not permanent tests
   in the three committed suites. Do not claim the runner covers gameworld flow.
+- After the per-table stake changes, all 105 existing tests passed again, along
+  with 22 local table-selection checks and 424 local wager checks. Those checks
+  exercised actual right-table interaction, 5/10/20 debits, push/win/bust/natural
+  payouts, Play Again, exact/insufficient funds, summary layout, and unchanged
+  left tables. These local check scripts/logs are also under ignored `.godot/`.
 - Optional terminal command, when Godot is on PATH:
   `godot --headless --path . res://tests/blackjack/blackjack_tests.tscn`
 - Inspector exports on `BlackjackDebug`: starting balance, max hands, AI seats,

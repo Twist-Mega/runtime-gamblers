@@ -9,9 +9,6 @@ const FakeWallet = preload("res://tests/blackjack/fake_wallet.gd")
 const WalletPort = preload("res://scripts/blackjack/blackjack_wallet_port.gd")
 const TABLE_ID = "development"
 const DEBUG_VIEW_SIZE = Vector2i(1280, 720)
-const STAKES = [
-	{"option_id": "starter", "label": "Starter", "amount": 5},
-]
 const DEAL_MODES = ["Shuffled", "Player blackjack", "Hit to bust", "Push (stand)", "Dealer bust (stand)"]
 
 @export_range(0, 1000000, 1) var starting_balance: int = 1000
@@ -27,6 +24,8 @@ const DEAL_MODES = ["Shuffled", "Player blackjack", "Hit to bust", "Push (stand)
 var _session: Session
 var _wallet: WalletPort
 var _provided_wallet: WalletPort
+var _table_id: String = TABLE_ID
+var _stake_amount: int = 5
 var _state: Dictionary = {}
 var _busy: bool = false
 var _displayed_cards: Dictionary = {"player": [], "dealer": []}
@@ -67,6 +66,15 @@ func configure_wallet(wallet: WalletPort) -> bool:
 	if wallet == null or is_inside_tree():
 		return false
 	_provided_wallet = wallet
+	return true
+
+
+## Fix the table and wager before starting its session.
+func configure_table(table_id: String, stake_amount: int) -> bool:
+	if is_inside_tree() or table_id.is_empty() or stake_amount <= 0 or stake_amount > Rules.MAX_WAGER:
+		return false
+	_table_id = table_id
+	_stake_amount = stake_amount
 	return true
 
 
@@ -241,7 +249,8 @@ func _reset_test_session() -> void:
 
 func _start_session() -> void:
 	_mode.select(0)
-	_session = Session.new(_wallet, {TABLE_ID: {"max_hands": max_hands, "stake_options": STAKES,
+	var stakes := [{"option_id": "starter", "label": "Starter", "amount": _stake_amount}]
+	_session = Session.new(_wallet, {_table_id: {"max_hands": max_hands, "stake_options": stakes,
 		"ai_seats": ai_seats}})
 	_state = _session.get_public_state()
 	_reset_cards()
@@ -266,7 +275,7 @@ func _request(action: String) -> void:
 	var response: Dictionary
 	match action:
 		"open_blackjack":
-			response = _session.open_blackjack(TABLE_ID)
+			response = _session.open_blackjack(_table_id)
 		"start_next_hand":
 			response = _session.start_next_hand(_scenario_deck())
 		_:
@@ -403,7 +412,7 @@ func _refresh_view() -> void:
 	_set_active_seat(active_seat)
 	_balance_label.text = "Balance: %d" % _state.balance
 	_progress_label.text = "Hand %d / %d | Completed: %d" % [_state.hand_number, _state.max_hands, _state.hands_played]
-	_stake_label.text = "Stake: %d" % STAKES[0].amount
+	_stake_label.text = "Stake: %d" % _stake_amount
 	var prompts := {
 		"SELECTING_STAKE": "Insufficient funds for the stake. Leave the table or reset the test money.",
 		"READY": "Start the first hand when ready.",

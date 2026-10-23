@@ -226,14 +226,20 @@ position = Vector2(0, -191)
 [node name="21BottomRight" parent="BlackjackTables" unique_id=1928121491 instance=ExtResource("5_8repx")]
 position = Vector2(176, 0)
 script = ExtResource("4_ygfup")
+table_id = "blackjack_bottom_right"
+stake_amount = 5
 
 [node name="21MiddleRight" parent="BlackjackTables" unique_id=1577435322 instance=ExtResource("5_8repx")]
 position = Vector2(176, -96)
 script = ExtResource("4_ygfup")
+table_id = "blackjack_middle_right"
+stake_amount = 10
 
 [node name="21TopRight" parent="BlackjackTables" unique_id=111689003 instance=ExtResource("5_8repx")]
 position = Vector2(176, -192)
 script = ExtResource("4_ygfup")
+table_id = "blackjack_top_right"
+stake_amount = 20
 
 [node name="Main_Char" type="CharacterBody2D" parent="." unique_id=1975199492 groups=["player"]]
 position = Vector2(-8, 66)
@@ -304,3 +310,7 @@ position = Vector2(144, 32)
 
 [node name="rightd_guard" parent="NPCS" unique_id=1683577118 instance=ExtResource("6_667gv")]
 position = Vector2(31, 65)
+
+[connection signal="table_selected" from="BlackjackTables/21BottomRight" to="UI_layer/blackjack_table_UI" method="select_table"]
+[connection signal="table_selected" from="BlackjackTables/21MiddleRight" to="UI_layer/blackjack_table_UI" method="select_table"]
+[connection signal="table_selected" from="BlackjackTables/21TopRight" to="UI_layer/blackjack_table_UI" method="select_table"]

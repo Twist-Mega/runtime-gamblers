@@ -21,12 +21,22 @@ Final artwork and saving money across application launches remain future work.
 
 1. Press **F5** to run the gameworld.
 2. Approach a **right-side blackjack table** and press **X** to open the green popup.
-3. Click **Play**, then **Start Hand**. The stake is **5** per hand.
+3. Check the stake shown in the popup, then click **Play** and **Start Hand**.
 4. Use **Hit** or **Stand**, then **Next Hand** to continue.
 5. **Leave Table**, five completed hands, or insufficient funds returns you to
    the green popup with a summary: **Hands, Start, End, and Net**.
 6. Choose **Play Again** to start a new session with the current balance, or
    press **C** on the green popup to resume exploring.
+
+| Right-side table | Stake per hand |
+| --- | --- |
+| Bottom | 5 |
+| Middle | 10 |
+| Top | 20 |
+
+Each table's stake stays fixed for its session. **Play Again** uses that same
+table and stake; both Play and Play Again require enough money for that stake.
+The blackjack display and green summary also show the selected table's stake.
 
 The left tables have no blackjack interaction or UI yet. Gameworld play uses
 the official Wallet, which starts at 100 on a fresh launch and also supplies the
@@ -88,5 +98,6 @@ They exercise the engine, session, and display automatically. For manual play,
 use `tests/blackjack/blackjack_debug.tscn`.
 
 The three suites above do not cover the complete gameworld interaction. Also
-manually check right table -> X -> Play -> hand -> green summary -> Play Again/C,
-and confirm that the balance carries over and agrees with the pause menu.
+manually check each right table -> X -> Play -> hand -> green summary -> Play Again/C.
+Confirm bottom/middle/top use 5/10/20, the stake carries over on Play Again, and
+the official balance agrees with the summary and pause menu.
