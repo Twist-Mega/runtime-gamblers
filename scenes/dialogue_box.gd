@@ -1,4 +1,3 @@
-
 extends CanvasLayer
 
 const CHAR_READ_RATE = 0.0275
@@ -22,10 +21,6 @@ var tween
 func _ready() -> void:
 	print("Starting state: State.READY")
 	hide_dialogue()
-	queue_dialogue("And if you'll only attend, kitty,")
-	queue_dialogue("And not talk so much")
-	queue_dialogue("I'll tell you all my ideas...")
-	queue_dialogue("About looking-glass house!")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -43,9 +38,23 @@ func _process(delta: float) -> void:
 			if Input.is_action_just_pressed("ui_accept"):
 				change_state(State.READY)
 				hide_dialogue()
-				
+
+# --- Public API (call these from NPCs/objects) ---
+
+# Queue a single line
 func queue_dialogue(next_dialogue):
 	dialogue_queue.push_back(next_dialogue)
+
+# Queue a whole conversation (e.g. an NPC's exported lines)
+func start_dialogue(lines: Array[String]) -> void:
+	for line in lines:
+		queue_dialogue(line)
+
+# True while a conversation is in progress, so NPCs don't retrigger it
+func is_busy() -> bool:
+	return current_state != State.READY or !dialogue_queue.is_empty()
+
+# --- Internals ---
 
 func show_dialogue():
 	dialogue_container.show()
