@@ -95,11 +95,9 @@ scale = Vector2(0.3, 0.3)
 texture = ExtResource("2_8repx")
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
-visible = false
 
 [node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
 process_mode = 2
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -125,7 +123,6 @@ vertical_alignment = 1
 
 [node name="bar_UI" type="ColorRect" parent="UI_layer" unique_id=2018191039]
 process_mode = 2
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
