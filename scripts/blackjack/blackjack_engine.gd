@@ -3,11 +3,13 @@ extends RefCounted
 ## One round of blackjack, independent of scenes, input, money storage, and animation.
 ## Commands return copied public state and ordered events; they never emit callbacks.
 
-enum Phase { BETTING, DEALING, PLAYER_TURN, DEALER_TURN, SETTLED }
+enum Phase { BETTING, DEALING, PLAYER_TURN, AI_TURN, DEALER_TURN, SETTLED }
 
 const SUITS = ["clubs", "diamonds", "hearts", "spades"]
 const PLAYER_SEAT = "player"
 const DEALER_SEAT = "dealer"
+const AI_SEATS = ["left_2", "left_1", "right_1", "right_2"]
+const SEAT_ORDER = ["left_2", "left_1", "player", "right_1", "right_2"]
 # Largest wager whose rounded blackjack return fits in a signed 64-bit integer.
 const MAX_WAGER: int = 3_689_348_814_741_910_322
 
@@ -22,10 +24,23 @@ var _player_cards: Array[Dictionary] = []
 var _dealer_cards: Array[Dictionary] = []
 var _dealer_revealed: bool = false
 var _result: Dictionary = {}
+var _ai_seats: Array = []
+var _order: Array[String] = []
+var _ai_cards: Dictionary = {}
+var _seat_results: Dictionary = {}
+var _stood: Dictionary = {}
+var _turn_index: int = -1
+var _active_seat: String = ""
 
 
 ## Supply an integer seed for repeatable shuffles, or omit it for random play.
-func _init(random_seed: Variant = null) -> void:
+func _init(random_seed: Variant = null, occupied_ai_seats: Array = []) -> void:
+	_ai_seats = occupied_ai_seats.duplicate(true)
+	for seat_id in SEAT_ORDER:
+		if seat_id == PLAYER_SEAT or seat_id in _ai_seats:
+			_order.append(seat_id)
+	for seat_id in AI_SEATS:
+		_ai_cards[seat_id] = []
 	if random_seed == null:
 		_rng.randomize()
 	else:
@@ -39,6 +54,9 @@ func begin_round(wager: int, deck_order: Array = []) -> Dictionary:
 		return _reject("invalid_phase", "Finish the active round before starting another.")
 	if wager <= 0 or wager > MAX_WAGER:
 		return _reject("invalid_wager", "Wager must be between 1 and %d." % MAX_WAGER)
+	var seats_error := validate_ai_seats(_ai_seats)
+	if not seats_error.is_empty():
+		return _reject("invalid_seats", seats_error)
 	if not deck_order.is_empty():
 		var deck_error := _validate_deck(deck_order)
 		if not deck_error.is_empty():
@@ -53,6 +71,12 @@ func begin_round(wager: int, deck_order: Array = []) -> Dictionary:
 	_dealer_cards = []
 	_dealer_revealed = false
 	_result = {}
+	_seat_results = {}
+	_stood = {}
+	_turn_index = -1
+	_active_seat = ""
+	for seat_id in AI_SEATS:
+		_ai_cards[seat_id] = []
 	_wager = wager
 	_round_id += 1
 	_event_sequence = 0
@@ -60,23 +84,26 @@ func begin_round(wager: int, deck_order: Array = []) -> Dictionary:
 	var events: Array[Dictionary] = []
 	_emit(events, "round_started", {"wager": _wager})
 	_change_phase(Phase.DEALING, events)
-	_deal_card(PLAYER_SEAT, events)
-	_deal_card(DEALER_SEAT, events)
-	_deal_card(PLAYER_SEAT, events)
-	_deal_card(DEALER_SEAT, events)
+	for pass_index in range(2):
+		for seat_id in _order:
+			_deal_card(seat_id, events)
+		_deal_card(DEALER_SEAT, events)
 
-	var player_score := _score_hand(_player_cards)
 	var dealer_score := _score_hand(_dealer_cards)
-	if player_score.is_blackjack or dealer_score.is_blackjack:
+	if dealer_score.is_blackjack:
 		_reveal_dealer(events)
-		if player_score.is_blackjack and dealer_score.is_blackjack:
-			_settle("push", "both_blackjack", events)
-		elif player_score.is_blackjack:
-			_settle("blackjack", "player_blackjack", events)
-		else:
-			_settle("loss", "dealer_blackjack", events)
+		for seat_id in _order:
+			if _score_hand(_cards_for(seat_id)).is_blackjack:
+				_settle_seat(seat_id, "push", "both_blackjack", events)
+			else:
+				_settle_seat(seat_id, "loss", "dealer_blackjack", events)
+		_finish_round(events)
 	else:
-		_change_phase(Phase.PLAYER_TURN, events)
+		# Only the outcome of the peek is used. The hole card remains private.
+		for seat_id in _order:
+			if _score_hand(_cards_for(seat_id)).is_blackjack:
+				_settle_seat(seat_id, "blackjack", "player_blackjack", events)
+		_next_turn(events)
 	return _accept(events)
 
 
@@ -88,11 +115,12 @@ func hit() -> Dictionary:
 	_deal_card(PLAYER_SEAT, events)
 	var score := _score_hand(_player_cards)
 	if score.is_bust:
-		_reveal_dealer(events)
-		_settle("loss", "player_bust", events)
+		_settle_seat(PLAYER_SEAT, "loss", "player_bust", events)
+		_next_turn(events)
 	elif score.total == 21:
 		_action(PLAYER_SEAT, "stand", true, events)
-		_play_dealer(events)
+		_stood[PLAYER_SEAT] = true
+		_next_turn(events)
 	return _accept(events)
 
 
@@ -101,8 +129,74 @@ func stand() -> Dictionary:
 		return _reject("invalid_phase", "Stand is only available during the player's turn.")
 	var events: Array[Dictionary] = []
 	_action(PLAYER_SEAT, "stand", false, events)
-	_play_dealer(events)
+	_stood[PLAYER_SEAT] = true
+	_next_turn(events)
 	return _accept(events)
+
+
+## One automatic AI decision, or the dealer's complete turn. No timers or UI.
+func advance_table() -> Dictionary:
+	if _phase != Phase.AI_TURN and _phase != Phase.DEALER_TURN:
+		return _reject("invalid_phase", "The table only advances during an automatic turn.")
+	var events: Array[Dictionary] = []
+	if _phase == Phase.DEALER_TURN:
+		_play_dealer(events)
+	else:
+		var seat_id := _active_seat
+		var score := _score_hand(_cards_for(seat_id))
+		if score.total < 17:
+			_action(seat_id, "hit", true, events)
+			_deal_card(seat_id, events)
+			score = _score_hand(_cards_for(seat_id))
+			if score.is_bust:
+				_settle_seat(seat_id, "loss", "player_bust", events)
+				_next_turn(events)
+			elif score.total == 21:
+				_action(seat_id, "stand", true, events)
+				_stood[seat_id] = true
+				_next_turn(events)
+		else:
+			_action(seat_id, "stand", true, events)
+			_stood[seat_id] = true
+			_next_turn(events)
+	return _accept(events)
+
+
+static func validate_ai_seats(seats: Variant) -> String:
+	if not seats is Array:
+		return "ai_seats must be an array of seat IDs."
+	var seen: Dictionary = {}
+	for seat_id in seats:
+		if not seat_id is String or seat_id not in AI_SEATS or seen.has(seat_id):
+			return "AI seats must be unique IDs from left_2, left_1, right_1, right_2."
+		seen[seat_id] = true
+	return ""
+
+
+func _next_turn(events: Array[Dictionary]) -> void:
+	_turn_index += 1
+	while _turn_index < _order.size():
+		_active_seat = _order[_turn_index]
+		if not _seat_results.has(_active_seat):
+			_change_phase(Phase.PLAYER_TURN if _active_seat == PLAYER_SEAT else Phase.AI_TURN, events)
+			return
+		_turn_index += 1
+	_active_seat = DEALER_SEAT
+	if _seat_results.size() == _order.size():
+		_finish_round(events)
+	elif _ai_seats.is_empty():
+		# Preserve the single-player API: Stand resolves the dealer synchronously.
+		_play_dealer(events)
+	else:
+		_change_phase(Phase.DEALER_TURN, events)
+
+
+func _cards_for(seat_id: String) -> Array:
+	if seat_id == PLAYER_SEAT:
+		return _player_cards
+	if seat_id == DEALER_SEAT:
+		return _dealer_cards
+	return _ai_cards.get(seat_id, [])
 
 
 ## Dealer totals/flags are null while a card is hidden. visible_total is safe to show.
@@ -110,18 +204,35 @@ func get_public_state() -> Dictionary:
 	var actions: Array[String] = []
 	if _phase == Phase.PLAYER_TURN:
 		actions.assign(["hit", "stand"])
+	elif _phase == Phase.AI_TURN or _phase == Phase.DEALER_TURN:
+		actions.assign(["advance_table"])
 	elif _phase == Phase.BETTING or _phase == Phase.SETTLED:
 		actions.assign(["begin_round"])
+	var seats: Array[Dictionary] = []
+	# Keep the original player/dealer entries first for existing consumers.
+	for seat_id in [PLAYER_SEAT, DEALER_SEAT] + AI_SEATS:
+		var occupied: bool = seat_id in _order or seat_id == DEALER_SEAT
+		var result: Variant = _seat_results.get(seat_id)
+		var status := "EMPTY" if not occupied else "WAITING"
+		if seat_id == DEALER_SEAT and _phase == Phase.SETTLED:
+			var score := _score_hand(_dealer_cards)
+			status = "BUST" if score.is_bust else "BLACKJACK" if score.is_blackjack else "FINISHED"
+		if _stood.has(seat_id):
+			status = "STOOD"
+		if seat_id == _active_seat:
+			status = "PLAYING"
+		if result != null:
+			status = "BUST" if result.reason == "player_bust" else result.outcome.to_upper()
+		seats.append({"seat_id": seat_id, "role": "dealer" if seat_id == DEALER_SEAT else "player" if seat_id == PLAYER_SEAT else "ai",
+			"occupied": occupied, "status": status, "hands": [_public_hand(seat_id)],
+			"result": result.duplicate(true) if result != null else null})
 	return {
 		"round_id": _round_id,
 		"phase": Phase.keys()[_phase],
 		"wager": _wager,
-		"active_seat_id": PLAYER_SEAT if _phase == Phase.PLAYER_TURN else null,
+		"active_seat_id": _active_seat if not _active_seat.is_empty() else null,
 		"legal_actions": actions,
-		"seats": [
-			{"seat_id": PLAYER_SEAT, "role": "player", "hands": [_public_hand(PLAYER_SEAT)]},
-			{"seat_id": DEALER_SEAT, "role": "dealer", "hands": [_public_hand(DEALER_SEAT)]},
-		],
+		"seats": seats,
 		"result": _result.duplicate(true) if not _result.is_empty() else null,
 	}
 
@@ -172,7 +283,7 @@ func _shuffle_deck() -> void:
 		_deck[other_index] = card
 
 
-func _score_hand(cards: Array[Dictionary]) -> Dictionary:
+func _score_hand(cards: Array) -> Dictionary:
 	var total: int = 0
 	var high_aces: int = 0
 	for card in cards:
@@ -206,7 +317,7 @@ func _public_card(card: Dictionary, face_up: bool) -> Dictionary:
 
 
 func _public_hand(seat_id: String) -> Dictionary:
-	var cards := _player_cards if seat_id == PLAYER_SEAT else _dealer_cards
+	var cards := _cards_for(seat_id)
 	var public_cards: Array[Dictionary] = []
 	var visible_cards: Array[Dictionary] = []
 	var has_hidden_card: bool = false
@@ -230,7 +341,7 @@ func _public_hand(seat_id: String) -> Dictionary:
 
 
 func _deal_card(seat_id: String, events: Array[Dictionary]) -> void:
-	var cards := _player_cards if seat_id == PLAYER_SEAT else _dealer_cards
+	var cards := _cards_for(seat_id)
 	var card := _deck[_draw_index]
 	_draw_index += 1
 	var card_index := cards.size()
@@ -257,27 +368,35 @@ func _reveal_dealer(events: Array[Dictionary]) -> void:
 
 
 func _play_dealer(events: Array[Dictionary]) -> void:
-	_change_phase(Phase.DEALER_TURN, events)
+	_active_seat = DEALER_SEAT
+	if _phase != Phase.DEALER_TURN:
+		_change_phase(Phase.DEALER_TURN, events)
 	_reveal_dealer(events)
 	var dealer_score := _score_hand(_dealer_cards)
 	while dealer_score.total < 17:
 		_action(DEALER_SEAT, "hit", true, events)
 		_deal_card(DEALER_SEAT, events)
 		dealer_score = _score_hand(_dealer_cards)
-	if dealer_score.is_bust:
-		_settle("win", "dealer_bust", events)
+	if not dealer_score.is_bust:
+		_action(DEALER_SEAT, "stand", true, events)
+	for seat_id in _order:
+		if _seat_results.has(seat_id):
+			continue
+		var score := _score_hand(_cards_for(seat_id))
+		if dealer_score.is_bust:
+			_settle_seat(seat_id, "win", "dealer_bust", events)
+		elif score.total > dealer_score.total:
+			_settle_seat(seat_id, "win", "higher_total", events)
+		elif score.total < dealer_score.total:
+			_settle_seat(seat_id, "loss", "lower_total", events)
+		else:
+			_settle_seat(seat_id, "push", "equal_total", events)
+	_finish_round(events)
+
+
+func _settle_seat(seat_id: String, outcome: String, reason: String, events: Array[Dictionary]) -> void:
+	if _seat_results.has(seat_id):
 		return
-	_action(DEALER_SEAT, "stand", true, events)
-	var player_score := _score_hand(_player_cards)
-	if player_score.total > dealer_score.total:
-		_settle("win", "higher_total", events)
-	elif player_score.total < dealer_score.total:
-		_settle("loss", "lower_total", events)
-	else:
-		_settle("push", "equal_total", events)
-
-
-func _settle(outcome: String, reason: String, events: Array[Dictionary]) -> void:
 	var returned_amount: int = 0
 	match outcome:
 		"win":
@@ -288,23 +407,35 @@ func _settle(outcome: String, reason: String, events: Array[Dictionary]) -> void
 			# Stake + ceil(3 * stake / 2), with exact integer arithmetic.
 			@warning_ignore("integer_division")
 			returned_amount = _wager * 2 + _wager / 2 + _wager % 2
-	_result = {
+	var result := {
 		"round_id": _round_id,
+		"seat_id": seat_id,
 		"outcome": outcome,
 		"reason": reason,
 		"wager": _wager,
 		"returned_amount": returned_amount,
 		"net_change": returned_amount - _wager,
-		"player_total": _score_hand(_player_cards).total,
-		"dealer_total": _score_hand(_dealer_cards).total,
+		"player_total": _score_hand(_cards_for(seat_id)).total,
+		"dealer_total": _score_hand(_dealer_cards).total if _dealer_revealed else null,
 	}
+	_seat_results[seat_id] = result
+	if seat_id == PLAYER_SEAT:
+		_result = result
+	_emit(events, "seat_settled", {"seat_id": seat_id, "result": result})
+
+
+func _finish_round(events: Array[Dictionary]) -> void:
+	_reveal_dealer(events)
+	for result in _seat_results.values():
+		result.dealer_total = _score_hand(_dealer_cards).total
+	_active_seat = ""
 	_change_phase(Phase.SETTLED, events)
 	_emit(events, "round_finished", {"result": _result})
 
 
 func _change_phase(phase: Phase, events: Array[Dictionary]) -> void:
 	_phase = phase
-	_emit(events, "phase_changed", {"phase": Phase.keys()[_phase]})
+	_emit(events, "phase_changed", {"phase": Phase.keys()[_phase], "active_seat_id": _active_seat})
 
 
 func _action(seat_id: String, action: String, automatic: bool, events: Array[Dictionary]) -> void:

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://deavu5rjgylxc"]
 
-[ext_resource type="Script" path="res://tests/blackjack/blackjack_debug.gd" id="1_debug"]
+[ext_resource type="Script" uid="uid://dboymyyptqpsq" path="res://tests/blackjack/blackjack_debug.gd" id="1_debug"]
 
-[node name="BlackjackDebug" type="Control"]
+[node name="BlackjackDebug" type="Control" unique_id=1145565830]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,3 +10,5 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_debug")
+ai_first_move_delay = 2.0
+ai_next_move_delay = 1.0

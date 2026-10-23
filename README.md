@@ -6,7 +6,8 @@ A casino RPG made in Godot for Capstone II
 
 ## Blackjack
 
-The standalone GDScript engine handles one hand of blackjack and exposes copied
+The standalone GDScript engine handles one shared-deck table round with optional
+generic AI players and exposes copied
 state and ordered events for a future display. See [the engine API and tests](docs/blackjack_engine.md).
 
 The [session controller](docs/blackjack_session_controller.md) manages selectable
@@ -17,13 +18,20 @@ The production wallet adapter, lobby integration, and final artwork remain futur
 
 ## Play the development blackjack table
 
-Open `tests/blackjack/blackjack_debug.tscn` in Godot and press **F6**. Choose
-**Stake 5**, click **Start Hand**, and use **Hit** or **Stand**. Between hands,
+Open `tests/blackjack/blackjack_debug.tscn` in Godot and press **F6**. The stake
+is already set to **5**. Click **Start Hand**, and use **Hit** or **Stand**. Between hands,
 choose **Next Hand** or **Leave Table**. Review the summary, then **Close Session**.
 
+Four AI chairs are occupied by default, two on each side. Their Hit/Stand moves
+advance automatically, waiting 1 second before an AI's first move and 0.75 seconds
+before later moves in its turn. Busts and confirmed blackjacks settle immediately, with
+faster playback until the rest of the table finishes. Other hands settle after
+the dealer. Edit the root's **Ai Seats** array in the Inspector before F6 to
+configure occupancy; an empty array gives the original single-player game.
+
 You start with 1,000 fake money units. **New Session** keeps that balance;
-**Reset test money** starts over. The testing tools include preset deals, a higher
-stake unlock, and a one-time failed return to check retry behavior. See the
+**Reset test money** starts over. The testing tools include preset deals and
+a one-time failed return to check retry behavior. See the
 [manual testing instructions](docs/blackjack_debug_display.md) for expected results.
 
 ## Run blackjack tests in Godot
@@ -39,9 +47,9 @@ You do not need a terminal command, PATH setup, or a main scene for this.
 Currently, successful output ends with:
 
 ```text
-Blackjack: 33 tests, 1691 checks, 0 failures.
-Blackjack sessions: 36 tests, 597 checks, 0 failures.
-Blackjack display: 10 tests, 124 checks, 0 failures.
+Blackjack: 42 tests, 6391 checks, 0 failures.
+Blackjack sessions: 42 tests, 724 checks, 0 failures.
+Blackjack display: 17 tests, 235 checks, 0 failures.
 Blackjack tests: ALL SUITES PASSED.
 ```
 

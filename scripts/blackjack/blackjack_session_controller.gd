@@ -1,6 +1,6 @@
 class_name BlackjackSessionController
 extends RefCounted
-## Table sessions around the single-hand engine. No scenes, UI, or wallet storage.
+## Table sessions around the shared-deck engine. No scenes, UI, or wallet storage.
 
 const Blackjack = preload("res://scripts/blackjack/blackjack_engine.gd")
 const WalletPort = preload("res://scripts/blackjack/blackjack_wallet_port.gd")
@@ -68,6 +68,10 @@ func stand() -> Dictionary:
 	return _execute(_play.bind("stand"))
 
 
+func advance_table() -> Dictionary:
+	return _execute(_play.bind("advance_table"))
+
+
 func leave_table() -> Dictionary:
 	return _execute(_leave)
 
@@ -95,7 +99,7 @@ func get_public_state() -> Dictionary:
 			if balance >= _stake.amount and _is_unlocked(_stake):
 				actions.push_front("start_next_hand")
 		Phase.PLAYING:
-			actions.assign(["hit", "stand"])
+			actions.assign(_engine.get_public_state().legal_actions)
 		Phase.PAYOUT_PENDING, Phase.REFUND_PENDING:
 			actions.assign(["retry_pending_transaction"])
 		Phase.COMPLETE:
@@ -153,7 +157,7 @@ func _open(table_id: String) -> Dictionary:
 		option["label"] = option.get("label", str(option.amount))
 		option["unlock_id"] = option.get("unlock_id", null)
 	_session_id = Crypto.new().generate_random_bytes(16).hex_encode()
-	_engine = Blackjack.new(_random_seed)
+	_engine = Blackjack.new(_random_seed, _table.get("ai_seats", []))
 	_stake = {}
 	_starting_balance = _wallet.get_balance()
 	_hands_started = 0
@@ -221,6 +225,7 @@ func _start(deck_order: Array) -> Dictionary:
 	_emit(events, "hand_started", {"wager": _stake.amount})
 	_append_engine_events(events, engine_response.events)
 	var result: Variant = _process_result(engine_response.result, events)
+	_complete_round_if_ready(events)
 	return _accept(events, result)
 
 
@@ -233,6 +238,7 @@ func _play(action: String) -> Dictionary:
 	var events: Array[Dictionary] = []
 	_append_engine_events(events, engine_response.events)
 	var result: Variant = _process_result(engine_response.result, events)
+	_complete_round_if_ready(events)
 	return _accept(events, result)
 
 
@@ -259,6 +265,17 @@ func _record_result(result: Dictionary, events: Array[Dictionary]) -> void:
 	_history.append(result.duplicate(true))
 	_pending = {}
 	_emit(events, "hand_settled", {"result": result})
+	_phase = Phase.PLAYING
+
+
+func _complete_round_if_ready(events: Array[Dictionary]) -> void:
+	if _phase != Phase.PLAYING or _engine.get_public_state().phase != "SETTLED":
+		return
+	var final_result: Dictionary = _engine.get_public_state().result
+	if not _settled_rounds.has(final_result.round_id):
+		return
+	# Early payments remain final; only enrich the history after the reveal.
+	_history[-1].dealer_total = final_result.dealer_total
 	if _history.size() >= _table.max_hands:
 		_finish_session("hand_limit", events)
 	elif _wallet.get_balance() < _stake.amount:
@@ -280,6 +297,7 @@ func _retry() -> Dictionary:
 		return _accept(events)
 	var result: Dictionary = _pending.result.duplicate(true)
 	_record_result(result, events)
+	_complete_round_if_ready(events)
 	return _accept(events, result)
 
 
@@ -333,6 +351,9 @@ func _validate_table(config: Variant) -> String:
 	var max_hands: Variant = config.get("max_hands", 5)
 	if not max_hands is int or max_hands <= 0:
 		return "max_hands must be a positive integer."
+	var seats_error := Blackjack.validate_ai_seats(config.get("ai_seats", []))
+	if not seats_error.is_empty():
+		return seats_error
 	var options: Variant = config.get("stake_options")
 	if not options is Array or options.is_empty():
 		return "A table must have at least one stake option."

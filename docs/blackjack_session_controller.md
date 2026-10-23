@@ -1,7 +1,7 @@
 # Blackjack session controller
 
 `scripts/blackjack/blackjack_session_controller.gd` manages a table visit around the
-[single-hand engine](blackjack_engine.md). It selects one stake, plays up to a
+[shared-deck engine](blackjack_engine.md). It selects one stake, plays up to a
 configured number of hands (default five), settles each hand through an injected
 wallet, and prepares the session result before closing. It has no scenes, input,
 display, lobby transitions, or production wallet storage. The
@@ -16,6 +16,7 @@ const Session = preload("res://scripts/blackjack/blackjack_session_controller.gd
 var tables = {
 	"lobby_blackjack": {
 		"max_hands": 5,
+		"ai_seats": ["left_2", "left_1", "right_1", "right_2"],
 		"stake_options": [
 			{"option_id": "starter", "label": "Starter", "amount": 5},
 			{"option_id": "higher", "label": "Higher stakes", "amount": 25,
@@ -33,6 +34,7 @@ response = session.start_next_hand()
 
 # Forward Hit/Stand buttons to session.hit() and session.stand().
 # Play response.events in order before enabling the next input.
+# While advance_table is legal, play session.advance_table() events automatically.
 ```
 
 Every command must be checked for `accepted`. Use the controller's top-level
@@ -65,6 +67,12 @@ selection, another hand cannot start, but leaving before/between hands still wor
 Add another table entry for high-roller stake options; no room scene is implemented
 here.
 
+Optional `ai_seats` lists occupied chairs from `left_2`, `left_1`, `right_1`,
+`right_2`. Duplicate/unknown IDs and non-array values are rejected before a charge.
+Omitting it keeps the original single-player behavior. The registry and engine
+both copy this configuration, so occupancy is fixed for the visit. The development
+display enables all four chairs by default. AI results never transact with the wallet.
+
 ## Commands and session flow
 
 | API | Allowed phase and behavior |
@@ -73,6 +81,7 @@ here.
 | `select_stake(option_id)` | From `SELECTING_STAKE`; validate unlocks/funds, fix the stake, enter `READY`. No money is taken. |
 | `start_next_hand(deck_order = [])` | From `READY` or `BETWEEN_HANDS`; recheck availability/funds, deduct one stake, and begin the hand. Optional full fixed deck for tests. |
 | `hit()` / `stand()` | From `PLAYING`; resolve the move through the engine and settle any resulting outcome. |
+| `advance_table()` | From `PLAYING` when the engine exposes it; advance AI/dealer play. Human Hit/Stand are rejected during automatic turns. |
 | `leave_table()` | Before the first hand or from `BETWEEN_HANDS`. Never during an active hand or pending transfer. |
 | `acknowledge_result()` | From `COMPLETE`; close the session after the summary is displayed. |
 | `retry_pending_transaction()` | From `PAYOUT_PENDING` or `REFUND_PENDING`; retry the original transaction ID without replaying the hand. |
@@ -82,8 +91,13 @@ Normal phases are:
 
 `IDLE -> SELECTING_STAKE -> READY -> PLAYING -> BETWEEN_HANDS -> ... -> COMPLETE -> CLOSED`
 
-After each financially settled hand, increment `hands_played`, including pushes,
-naturals, and busts. End with `hand_limit` when the limit is reached, otherwise
+After each financially settled human hand, increment `hands_played`, including pushes,
+naturals, and busts. Busts and confirmed natural blackjacks settle early, while
+ordinary hands wait for the dealer. An early credit emits `hand_settled`, but the
+session stays in `PLAYING` until the **whole table** reaches `SETTLED`. Next Hand,
+Leave, and the final summary remain unavailable during the remaining AI turns.
+Later automatic commands cannot repeat the human payment or count another hand.
+At table completion, end with `hand_limit` when the limit is reached, otherwise
 `insufficient_funds` if the next stake is unaffordable. Check affordability after
 crediting the payout. A balance exactly equal to the stake can fund another hand.
 Funds are also rechecked immediately before starting, in case another system has
@@ -148,10 +162,11 @@ IDs; payouts are identified by session and engine round. Failed setup is refunde
 before another hand can start; another setup attempt gets a new deduction ID.
 Reentrant mutation from wallet/unlock callbacks is rejected as `busy`.
 
-If a payout fails, enter `PAYOUT_PENDING` and retain the engine outcome. The hand
-has finished, but its result is not added to settled history until the transfer
+If a payout fails, enter `PAYOUT_PENDING` and retain the engine outcome. The human
+outcome is known, but its result is not added to settled history until the transfer
 succeeds. The only permitted command is retry; successful retry credits once,
-records the hand, and then checks whether the session should finish. A failed
+records the hand, and resumes any remaining AI/dealer turns. If the table already
+finished, it checks whether the session should finish. A failed
 setup refund similarly blocks play/departure until refunded, then restores the
 pre-start phase without counting a hand. These are in-memory retries, not a
 save-game or crash-recovery system.

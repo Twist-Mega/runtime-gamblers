@@ -507,3 +507,199 @@ func test_many_seeded_hands_finish_without_duplicate_cards() -> bool:
 				seen[card.card_id] = true
 		_equal(_events_of(command, "round_finished").size(), 1, "Exactly one finishing event")
 	return true
+
+
+func _finish_table(engine: RefCounted) -> Array:
+	var events: Array = []
+	for step in range(64):
+		var state: Dictionary = engine.get_public_state()
+		if state.phase == "SETTLED":
+			return events
+		var command: Dictionary
+		if state.phase == "PLAYER_TURN":
+			command = engine.hit() if _hand(state).total < 17 else engine.stand()
+		else:
+			command = engine.advance_table()
+		_check(command.accepted, "Table action accepted")
+		events.append_array(command.events)
+	_check(false, "Table terminates within 64 moves")
+	return events
+
+
+func test_shared_deal_order_empty_chairs_and_ai_card_consumption() -> bool:
+	var engine := Blackjack.new(42, ["right_1", "left_1"])
+	var start := engine.begin_round(5, _deck([
+		_card(10), _card(9), _card(8), _card(6, "diamonds"),
+		_card(7), _card(9, "hearts"), _card(8, "hearts"), _card(5, "diamonds"),
+		_card(10, "hearts"), _card(10, "diamonds"),
+	]))
+	var dealt: Array = []
+	for event in _events_of(start, "card_dealt"):
+		dealt.append(event.seat_id)
+	_equal(dealt, ["left_1", "player", "right_1", "dealer", "left_1", "player", "right_1", "dealer"], "Seat order is fixed, not caller array order")
+	_equal(start.state.active_seat_id, "left_1", "Left AI goes first")
+	_equal(_hand(start.state, "left_2").cards, [], "Empty chair receives no cards")
+	_assert_rejected(engine, engine.hit(), start.state, "invalid_phase")
+	_assert_rejected(engine, engine.begin_round(5), start.state, "invalid_phase")
+	_equal(engine.advance_table().state.phase, "PLAYER_TURN", "AI stands at 17 before player acts")
+	var stand := engine.stand()
+	_equal(stand.state.active_seat_id, "right_1", "Right AI follows the player")
+	var hit := engine.advance_table()
+	_equal(_hand(hit.state, "right_1").cards[-1].rank, 10, "AI consumes the next shared card")
+	_equal(hit.state.phase, "DEALER_TURN", "Busted AI yields to dealer")
+	var finish := engine.advance_table()
+	_equal(_hand(finish.state, "dealer").cards[-1].suit, "diamonds", "Dealer gets the card after the AI draw")
+	_equal(finish.result.outcome, "loss", "Dealer's shared-deck 21 beats the player")
+	return true
+
+
+func test_early_blackjack_keeps_hole_card_private_and_other_seats_play() -> bool:
+	var engine := Blackjack.new(42, ["right_1"])
+	var start := engine.begin_round(5, _deck([
+		_card(1), _card(6), _card(6, "diamonds"),
+		_card(13), _card(5), _card(9, "diamonds"),
+		_card(6, "hearts"), _card(10, "hearts"),
+	]))
+	_equal(start.result.returned_amount, 13, "Player natural resolves before AI acts")
+	_equal(start.result.dealer_total, null, "Early result cannot expose hole-card total")
+	_equal(start.state.phase, "AI_TURN", "Table remains active after player blackjack")
+	_equal(_hand(start.state, "dealer").cards[1], {"face_up": false}, "Hole card remains hidden")
+	_equal(_events_of(start, "dealer_card_revealed"), [], "No premature reveal event")
+	_equal(_events_of(start, "round_finished"), [], "Player outcome is not table completion")
+	var later := _finish_table(engine)
+	_equal(engine.get_public_state().result.returned_amount, 13, "Later dealer bust does not change natural payout")
+	_equal(_hand(engine.get_public_state(), "right_1").total, 17, "AI finishes its hand")
+	var repeated: int = 0
+	for event in later:
+		if event.type == "seat_settled" and event.seat_id == "player":
+			repeated += 1
+	_equal(repeated, 0, "Player result is never emitted again")
+	_equal(start.result.dealer_total, null, "Previously returned result remains concealed after reveal")
+	return true
+
+
+func test_busted_player_waits_for_ai_and_dealer_without_changing_loss() -> bool:
+	var engine := Blackjack.new(42, ["right_1"])
+	engine.begin_round(5, _deck([_card(10), _card(10, "diamonds"), _card(6, "hearts"),
+		_card(8), _card(7, "diamonds"), _card(5, "hearts"), _card(10, "spades"), _card(8, "hearts")]))
+	var bust := engine.hit()
+	_equal(bust.result.reason, "player_bust", "Bust resolves immediately")
+	_equal(bust.state.phase, "AI_TURN", "AI still has a turn")
+	_equal(bust.result.dealer_total, null, "Bust result does not leak dealer's hidden total")
+	_assert_rejected(engine, engine.stand(), bust.state, "invalid_phase")
+	_finish_table(engine)
+	_equal(_hand(engine.get_public_state(), "dealer").cards.size(), 3, "Dealer draws for surviving AI")
+	_equal(engine.get_public_state().result.returned_amount, 0, "Player remains busted")
+	return true
+
+
+func test_all_players_bust_skips_unnecessary_dealer_draws() -> bool:
+	var engine := Blackjack.new(42, ["right_1"])
+	engine.begin_round(5, _deck([_card(10), _card(10, "diamonds"), _card(6, "hearts"),
+		_card(8), _card(6, "diamonds"), _card(5, "hearts"), _card(10, "spades"), _card(10, "hearts")]))
+	engine.hit()
+	var finish := engine.advance_table()
+	_equal(finish.state.phase, "SETTLED", "Last bust finishes the table")
+	_equal(_hand(finish.state, "dealer").cards.size(), 2, "No dealer draws when every wager is decided")
+	_equal(_events_of(finish, "round_finished").size(), 1, "One table completion")
+	return true
+
+
+func test_dealer_blackjack_settles_every_occupied_seat_immediately() -> bool:
+	var engine := Blackjack.new(42, ["left_1", "right_1"])
+	var finish := engine.begin_round(5, _deck([_card(1), _card(10), _card(9), _card(1, "diamonds"),
+		_card(13), _card(8), _card(7), _card(13, "diamonds")]))
+	_equal(finish.state.phase, "SETTLED", "Dealer natural stops all turns")
+	_equal(_events_of(finish, "seat_settled").size(), 3, "Each occupied player has exactly one result")
+	_equal(_events_of(finish, "action_taken"), [], "No AI or player hits against dealer blackjack")
+	_equal(finish.state.seats[2].result, null, "Empty outer chair has no wager result")
+	_equal(finish.result.outcome, "loss", "Human loses to dealer natural")
+	for seat in finish.state.seats:
+		if seat.seat_id == "left_1":
+			_equal(seat.result.outcome, "push", "AI natural pushes against dealer natural")
+	return true
+
+
+func test_ai_stands_on_soft_seventeen_and_cannot_peek() -> bool:
+	for hole_rank in [8, 10]:
+		var engine := Blackjack.new(42, ["right_1"])
+		engine.begin_round(5, _deck([_card(10), _card(1), _card(9, "diamonds"),
+			_card(8), _card(6), _card(hole_rank, "diamonds")]))
+		engine.stand()
+		var ai := engine.advance_table()
+		_equal(_events_of(ai, "action_taken")[0].action, "stand", "Same AI decision regardless of hole card")
+		_equal(_events_of(ai, "card_dealt"), [], "Soft 17 does not hit")
+		_equal(_hand(ai.state, "dealer").cards[1], {"face_up": false}, "Dealer remains concealed through AI's turn")
+	return true
+
+
+func test_invalid_ai_seats_are_rejected_before_dealing() -> bool:
+	for seats in [["player"], ["right_1", "right_1"], ["unknown"], [1]]:
+		var engine := Blackjack.new(42, seats)
+		var before := engine.get_public_state()
+		_assert_rejected(engine, engine.begin_round(5), before, "invalid_seats")
+	return true
+
+
+func test_ai_configuration_and_public_results_are_copied() -> bool:
+	var seats := ["right_1"]
+	var engine := Blackjack.new(42, seats)
+	seats.clear()
+	var start := engine.begin_round(5)
+	_equal(_hand(start.state, "right_1").cards.size(), 2, "Input mutation cannot empty an occupied chair")
+	var before := engine.get_public_state()
+	_hand(start.state, "right_1").cards[0].rank = 99
+	_equal(engine.get_public_state(), before, "AI card snapshots do not alias engine data")
+	_finish_table(engine)
+	var final := engine.get_public_state()
+	var original := engine.get_public_state()
+	for seat in final.seats:
+		if seat.result != null:
+			seat.result.returned_amount = 999
+	_equal(engine.get_public_state(), original, "AI result snapshots do not alias engine data")
+	return true
+
+
+func test_seeded_full_tables_terminate_and_reconstruct_all_cards() -> bool:
+	var first := Blackjack.new(91823, Blackjack.AI_SEATS)
+	var second := Blackjack.new(91823, Blackjack.AI_SEATS)
+	for round_index in range(60):
+		var start := first.begin_round(5)
+		_equal(start, second.begin_round(5), "Full-table seeded deal is repeatable")
+		var events: Array = start.events.duplicate(true)
+		for step in range(64):
+			var state := first.get_public_state()
+			if state.phase == "SETTLED":
+				break
+			var action := "advance_table"
+			if state.phase == "PLAYER_TURN":
+				action = "hit" if _hand(state).total < 17 else "stand"
+			var command: Dictionary = first.call(action)
+			_equal(command, second.call(action), "Full-table seeded action is repeatable")
+			events.append_array(command.events)
+		_equal(first.get_public_state().phase, "SETTLED", "Full table always terminates")
+		var displayed: Dictionary = {}
+		var seen: Dictionary = {}
+		var player_results: int = 0
+		var table_results: int = 0
+		for index in range(events.size()):
+			var event: Dictionary = events[index]
+			_equal(event.sequence, index + 1, "One ordered stream across all seats")
+			if event.type == "card_dealt":
+				if not displayed.has(event.seat_id):
+					displayed[event.seat_id] = []
+				displayed[event.seat_id].append(event.card)
+			elif event.type == "dealer_card_revealed":
+				displayed.dealer[event.card_index] = event.card
+			elif event.type == "seat_settled" and event.seat_id == "player":
+				player_results += 1
+			elif event.type == "round_finished":
+				table_results += 1
+		_equal(player_results, 1, "One player outcome per table round")
+		_equal(table_results, 1, "One completion per table round")
+		for seat in first.get_public_state().seats:
+			_equal(displayed[seat.seat_id], seat.hands[0].cards, "Events reconstruct every seat")
+			for card in seat.hands[0].cards:
+				_check(not seen.has(card.card_id), "All seats share a deck without replacement")
+				seen[card.card_id] = true
+	return true

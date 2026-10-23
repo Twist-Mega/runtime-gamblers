@@ -1,7 +1,7 @@
 # Blackjack engine
 
-`scripts/blackjack/blackjack_engine.gd` resolves **one hand** of player-versus-dealer
-blackjack. It has no scene nodes, input handling, printing, animations, wallet, or
+`scripts/blackjack/blackjack_engine.gd` resolves **one table round** with one human,
+up to four generic AI players, and a dealer sharing one deck. It has no scene nodes, input handling, printing, animations, wallet, or
 table/session dependencies. It can run in a headless test or behind a graphical
 display using the same API.
 
@@ -10,13 +10,17 @@ display using the same API.
 ```gdscript
 const Blackjack = preload("res://scripts/blackjack/blackjack_engine.gd")
 
-var blackjack = Blackjack.new() # Optional integer seed: Blackjack.new(12345).
+var blackjack = Blackjack.new(12345, ["left_1", "right_1"])
 var response = blackjack.begin_round(5)
 
 # Display response.events in order, then use response.state for the final view.
 # Only enable actions once that display playback has finished.
 if response.state.phase == "PLAYER_TURN":
 	response = blackjack.hit() # Or blackjack.stand().
+
+# The caller advances automatic turns after playing each batch of events.
+while "advance_table" in response.state.legal_actions:
+	response = blackjack.advance_table()
 
 if response.result != null:
 	# Example only: a session controller applies this return once.
@@ -30,21 +34,23 @@ apply money changes on a rejected command.
 
 | API | Behavior |
 | --- | --- |
-| `Blackjack.new(random_seed = null)` | Independent RNG; an integer seed reproduces the same sequence of shuffles within the same Godot version. |
+| `Blackjack.new(random_seed = null, occupied_ai_seats = [])` | Independent RNG and copied seat configuration. An integer seed reproduces the shuffle; omitting seats retains single-player play. |
 | `begin_round(wager: int, deck_order: Array = [])` | Start from `BETTING` or `SETTLED`. Validate first, reset the hand, deal, and check naturals. |
-| `hit()` | Deal one player card during `PLAYER_TURN`. Bust settles immediately; 21 automatically stands and runs the dealer. |
-| `stand()` | End `PLAYER_TURN`, reveal the dealer card, run the dealer, and settle. |
+| `hit()` | Deal one human card during `PLAYER_TURN`. Bust settles that seat immediately; 21 automatically stands. |
+| `stand()` | End the human turn and advance to the next occupied seat. With no AI, resolve the dealer synchronously as before. |
+| `advance_table()` | During `AI_TURN`, perform one AI decision. During `DEALER_TURN`, reveal and complete the dealer, then finish the round. No timers. |
 | `get_public_state()` | Return a fresh public snapshot without changing the game. |
 
 Every command returns a dictionary with:
 
 - `accepted`: whether the command changed the game.
 - `error`: `null` on success, otherwise `{code, message}`. Codes are
-  `invalid_phase`, `invalid_wager`, and `invalid_deck`.
+  `invalid_phase`, `invalid_wager`, `invalid_deck`, and `invalid_seats`.
 - `state`: the public snapshot after the command.
 - `events`: ordered changes caused by this command; empty on rejection.
-- `result`: the settlement produced by a successful finishing command, otherwise
-  `null`. A rejection never produces another settlement.
+- `result`: the human outcome once known, otherwise `null`. After an early bust
+  or natural, successful AI commands can return this same outcome again; callers
+  must deduplicate by round ID. The session controller does so. A rejection returns null.
 
 State, events, results, and fixed-deck inputs do not alias the engine's stored data.
 Changing a returned dictionary or array does not change game logic.
@@ -54,15 +60,17 @@ Changing a returned dictionary or array does not change game logic.
 Top-level fields are `round_id`, `phase`, `wager`, `active_seat_id`,
 `legal_actions`, `seats`, and `result`.
 
-- Phases: `BETTING`, `DEALING`, `PLAYER_TURN`, `DEALER_TURN`, `SETTLED`.
-  Dealing and dealer play happen synchronously inside a command; their phase
-  transitions are available in events for playback.
-- `active_seat_id` is `"player"` during the player's turn, otherwise `null`.
+- Phases: `BETTING`, `DEALING`, `PLAYER_TURN`, `AI_TURN`, `DEALER_TURN`, `SETTLED`.
+  Dealing and the dealer's complete play are synchronous command batches.
+- `active_seat_id` identifies the current human, AI, or dealer, otherwise null.
 - `legal_actions` is `["hit", "stand"]` during that turn, or `["begin_round"]`
   before the first round and after settlement. A session controller must
-  filter this against session limits, funds, and table rules.
-- Each seat has `seat_id`, `role`, and a `hands` array. Initial seat IDs/roles are
-  `"player"` and `"dealer"`. There is one hand per seat.
+  filter this against session limits, funds, and table rules. Automatic turns
+  expose only `advance_table`.
+- Each seat has `seat_id`, `role` (`player`, `dealer`, `ai`), `occupied`, `status`,
+  `result`, and a `hands` array. The original player/dealer entries remain first,
+  followed by `left_2`, `left_1`, `right_1`, `right_2`. Empty chairs have no cards
+  or result. Occupancy is copied at construction and fixed for all rounds.
 - Each hand has `hand_id`, `cards`, `visible_total`, `total`, `is_soft`,
   `is_blackjack`, and `is_bust`.
 - Face-up cards have integer `rank`, string `suit`, `card_id`, and `face_up: true`.
@@ -70,8 +78,10 @@ Top-level fields are `round_id`, `phase`, `wager`, `active_seat_id`,
   Suits are `clubs`, `diamonds`, `hearts`, and `spades`.
 - A hidden card is only `{face_up: false}`. It has no rank, suit, or card ID.
   While the dealer has a hidden card, their full `total` and scoring flags are
-  `null`; `visible_total` counts only visible cards. All cards are revealed before
-  settlement, including when the player busts.
+  `null`; `visible_total` counts only visible cards. Early seat results also have
+  `dealer_total: null`. Player busts and naturals do not reveal the dealer while
+  other players still need to act. The hole card is revealed at dealer play or
+  table completion, and final result snapshots then include the dealer total.
 
 `round_id` increases per engine instance. `hand_id` combines that round ID, seat,
 and hand slot. A session controller should combine its own session ID with
@@ -89,6 +99,7 @@ and continuing across that round's command batches.
 | `card_dealt` | `seat_id`, `hand_id`, zero-based `card_index`, `card` |
 | `action_taken` | `seat_id`, `hand_id`, `action` (`hit` or `stand`), `automatic` |
 | `dealer_card_revealed` | `seat_id`, `hand_id`, `card_index`, revealed `card` |
+| `seat_settled` | `seat_id`, that seat's `result`; emitted once when its outcome is known |
 | `round_finished` | `result` |
 
 Reset the displayed table on `round_started`, append cards on `card_dealt`, and
@@ -103,14 +114,19 @@ adapter can print the same events immediately.
 
 ## Rules and payouts
 
-Each round uses a fresh shuffled 52-card deck without replacement. Initial deals
-alternate player/dealer/player/dealer, with the dealer's second card hidden.
+Each round uses a fresh shared shuffled 52-card deck without replacement. For each
+of two dealing passes, deal to occupied seats in order `left_2`, `left_1`, `player`,
+`right_1`, `right_2`, then the dealer. Skip empty chairs. The dealer's second card is hidden.
 Face cards count as 10; aces adjust to the highest non-busting total. Only an
 initial two-card 21 is a natural blackjack.
 
-Both initial naturals push. A lone natural ends the round before player actions
-or dealer draws. The player can hit or stand; 21 automatically stands and a bust
-loses immediately. The dealer hits below 17 and stands on every 17, including
+Dealer blackjack ends the round immediately; any player natural pushes against it.
+Otherwise naturals are paid early and skipped in turn order. Each AI uses only its
+own score: hit below 17 and stand on every 17, including soft 17. There are no
+persistent AI bankrolls; their displayed wagers match the human's stake.
+The human can hit or stand; 21 automatically stands and a bust loses immediately.
+Other occupied seats continue after the human's outcome is known. The dealer
+draws only when an unresolved wager requires it, hits below 17 and stands on every 17, including
 soft 17. Dealer busts lose; otherwise higher total wins and equal totals push.
 There is no split, double down, insurance, or surrender.
 
@@ -119,7 +135,7 @@ unlock checks, affordability, and table minimums belong to the session controlle
 The upper bound ensures even the largest blackjack return fits in a signed
 64-bit integer. **Odd wagers are allowed.**
 
-The result contains `round_id`, `outcome`, `reason`, `wager`, `returned_amount`,
+Each seat result contains `round_id`, `seat_id`, `outcome`, `reason`, `wager`, `returned_amount`,
 `net_change`, `player_total`, and `dealer_total`.
 
 | Outcome | Returned amount, assuming the stake was already deducted |

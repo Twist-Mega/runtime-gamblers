@@ -2,6 +2,7 @@ extends SceneTree
 
 const Session = preload("res://scripts/blackjack/blackjack_session_controller.gd")
 const FakeWallet = preload("res://tests/blackjack/fake_wallet.gd")
+const SharedRules = preload("res://scripts/blackjack/blackjack_engine.gd")
 
 class Unlocks extends RefCounted:
 	var granted: Dictionary = {}
@@ -111,6 +112,146 @@ func _assert_rejected(session: RefCounted, command: Dictionary, before: Dictiona
 	_equal(command.events, [], "No events on ordinary rejection")
 	_equal(command.result, null, "No new settlement")
 	_equal(session.get_public_state(), before, "Public state unchanged")
+
+
+func _shared_fixture(balance: int = 100, max_hands: int = 5) -> Dictionary:
+	var wallet := FakeWallet.new(balance)
+	var session := Session.new(wallet, {"table": {"max_hands": max_hands,
+		"ai_seats": ["right_1"], "stake_options": [{"option_id": "five", "amount": 5}]}}, Callable(), 42)
+	session.open_blackjack("table")
+	session.select_stake("five")
+	return {"wallet": wallet, "session": session}
+
+
+func _shared_deck(natural: bool = true, bust: bool = false) -> Array:
+	var cards: Array
+	if natural:
+		cards = [_card(1), _card(6), _card(6, "diamonds"), _card(13), _card(5), _card(9, "diamonds"), _card(6, "hearts"), _card(10, "hearts")]
+	elif bust:
+		cards = [_card(10), _card(10, "diamonds"), _card(6, "hearts"), _card(8), _card(7, "diamonds"), _card(5, "hearts"), _card(10, "spades"), _card(8, "hearts")]
+	else:
+		cards = [_card(10), _card(10, "diamonds"), _card(9, "hearts"), _card(8), _card(7, "diamonds"), _card(8, "hearts")]
+	for suit in SharedRules.SUITS:
+		for rank in range(1, 14):
+			var card := _card(rank, suit)
+			if card not in cards:
+				cards.append(card)
+	return cards
+
+
+func _finish_shared_table(session: RefCounted) -> Array:
+	var events: Array = []
+	for step in range(64):
+		if "advance_table" not in session.get_public_state().legal_actions:
+			return events
+		var response: Dictionary = session.advance_table()
+		_check(response.accepted, "Automatic table move accepted")
+		events.append_array(response.events)
+	_check(false, "Automatic play terminates")
+	return events
+
+
+func test_early_blackjack_is_paid_once_before_table_completion() -> bool:
+	var fixture := _shared_fixture()
+	var session: RefCounted = fixture.session
+	var start: Dictionary = session.start_next_hand(_shared_deck())
+	_equal(start.state.balance, 108, "Natural credited before remaining AI moves")
+	_equal(start.state.hands_played, 1, "Financial history records early payment")
+	_equal(start.state.phase, "PLAYING", "Whole table is still playing")
+	_equal(start.state.legal_actions, ["advance_table"], "Only table advancement is allowed")
+	_equal(start.result.dealer_total, null, "Paid result keeps the hole-card total private")
+	_assert_rejected(session, session.leave_table(), start.state, "invalid_phase")
+	_assert_rejected(session, session.start_next_hand(), start.state, "invalid_phase")
+	var later := _finish_shared_table(session)
+	_equal(session.get_public_state().balance, 108, "AI results never change human wallet")
+	_equal(fixture.wallet.transactions.size(), 2, "Only one human stake and one human return")
+	_equal(session.get_public_state().phase, "BETWEEN_HANDS", "Departure becomes available after table completes")
+	var payments: int = 0
+	for event in later:
+		if event.type == "hand_settled":
+			payments += 1
+	_equal(payments, 0, "No repeated payment when table finishes")
+	return true
+
+
+func test_early_bust_does_not_end_low_funds_session_until_ai_finishes() -> bool:
+	var fixture := _shared_fixture(5)
+	var session: RefCounted = fixture.session
+	session.start_next_hand(_shared_deck(false, true))
+	var bust: Dictionary = session.hit()
+	_equal(bust.state.balance, 0, "Bust loses stake immediately")
+	_equal(bust.result.outcome, "loss", "Player outcome is available immediately")
+	_equal(bust.state.phase, "PLAYING", "Low balance does not cut off other seats")
+	_equal(bust.state.summary, null, "No final summary during active table")
+	_finish_shared_table(session)
+	_equal(session.get_public_state().phase, "COMPLETE", "Session ends after dealer finishes")
+	_equal(session.get_public_state().summary.reason, "insufficient_funds", "Correct final reason")
+	_equal(fixture.wallet.transactions.size(), 2, "AI does not charge additional wagers")
+	return true
+
+
+func test_early_credit_retry_resumes_remaining_table_without_double_payment() -> bool:
+	var fixture := _shared_fixture(100, 1)
+	var session: RefCounted = fixture.session
+	fixture.wallet.fail_next_credits = 1
+	var start: Dictionary = session.start_next_hand(_shared_deck())
+	_equal(start.state.phase, "PAYOUT_PENDING", "Failed early credit holds the table")
+	_equal(start.state.hand.phase, "AI_TURN", "AI has not been discarded")
+	_equal(start.state.balance, 95, "Unpaid return has not been credited")
+	_assert_rejected(session, session.advance_table(), start.state, "invalid_phase")
+	var retry: Dictionary = session.retry_pending_transaction()
+	_equal(retry.state.phase, "PLAYING", "Retry resumes table rather than finishing session")
+	_equal(retry.state.balance, 108, "Original return credited once")
+	_equal(retry.state.hands_played, 1, "One human hand recorded")
+	_finish_shared_table(session)
+	_equal(session.get_public_state().phase, "COMPLETE", "One-hand limit waits for all seats")
+	_equal(session.get_public_state().summary.ending_balance, 108, "Summary uses final human balance")
+	_equal(fixture.wallet.transactions.size(), 2, "Retry and AI completion do not duplicate credit")
+	return true
+
+
+func test_ordinary_hand_waits_for_dealer_before_payment() -> bool:
+	var fixture := _shared_fixture()
+	var session: RefCounted = fixture.session
+	session.start_next_hand(_shared_deck(false))
+	var stand: Dictionary = session.stand()
+	_equal(stand.result, null, "Standing is not a win yet")
+	_equal(stand.state.balance, 95, "No return at the end of the human's turn")
+	_equal(stand.state.hands_played, 0, "Unresolved hand is not financially settled")
+	var ai: Dictionary = session.advance_table()
+	_equal(ai.state.hand.phase, "DEALER_TURN", "Dealer plays after AI stands")
+	_equal(ai.state.balance, 95, "Still waiting for dealer outcome")
+	var finish: Dictionary = session.advance_table()
+	_equal(finish.result.returned_amount, 10, "Ordinary win returned after dealer finishes")
+	_equal(finish.state.balance, 105, "Only human payout changes wallet")
+	_assert_rejected(session, session.advance_table(), finish.state, "invalid_phase")
+	return true
+
+
+func test_five_shared_rounds_keep_occupancy_and_wait_before_summary() -> bool:
+	var fixture := _shared_fixture()
+	var session: RefCounted = fixture.session
+	for hand_number in range(1, 6):
+		var start: Dictionary = session.start_next_hand(_shared_deck())
+		_equal(start.state.phase, "PLAYING", "Even the last natural leaves AI in play")
+		_equal(start.state.hands_played, hand_number, "Each natural counts once")
+		_equal(start.state.hand.seats[4].occupied, true, "Right inner AI stays for the entire visit")
+		_finish_shared_table(session)
+	_equal(session.get_public_state().phase, "COMPLETE", "Exactly five full table rounds")
+	_equal(session.get_public_state().balance, 140, "Only five human natural payouts")
+	_equal(fixture.wallet.transactions.size(), 10, "Two human transactions per hand")
+	return true
+
+
+func test_invalid_ai_table_configuration_rejected_without_charge() -> bool:
+	for seats in ["right_1", ["player"], ["left_1", "left_1"], [false]]:
+		var wallet := FakeWallet.new(100)
+		var session := Session.new(wallet, {"table": {"ai_seats": seats,
+			"stake_options": [{"option_id": "five", "amount": 5}]}})
+		var before := session.get_public_state()
+		_assert_rejected(session, session.open_blackjack("table"), before, "invalid_table")
+		_equal(wallet.transactions.size(), 0, "Invalid seats cannot charge a wager")
+	return true
 
 
 func test_open_and_stake_selection_do_not_charge_upfront() -> bool:
