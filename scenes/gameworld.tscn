@@ -245,6 +245,13 @@ position = Vector2(-8, 66)
 disable_mode = 1
 script = ExtResource("4_uqaac")
 
+[node name="Camera2D" type="Camera2D" parent="Characters/Main_Char" unique_id=507962369]
+limit_left = -224
+limit_top = -220
+limit_right = 224
+limit_bottom = 83
+position_smoothing_enabled = true
+
 [node name="sprite" type="AnimatedSprite2D" parent="Characters/Main_Char" unique_id=271726775]
 position = Vector2(-1, -2)
 sprite_frames = ExtResource("4_8repx")
@@ -304,13 +311,6 @@ position = Vector2(144, 32)
 [node name="rightd_guard" parent="Characters" unique_id=1683577118 instance=ExtResource("6_667gv")]
 position = Vector2(31, 65)
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=507962369]
-position = Vector2(-8, 66)
-limit_left = -224
-limit_top = -220
-limit_right = 224
-limit_bottom = 83
-position_smoothing_enabled = true
 [connection signal="table_selected" from="BlackjackTables/21BottomRight" to="UI_layer/blackjack_table_UI" method="select_table"]
 [connection signal="table_selected" from="BlackjackTables/21MiddleRight" to="UI_layer/blackjack_table_UI" method="select_table"]
 [connection signal="table_selected" from="BlackjackTables/21TopRight" to="UI_layer/blackjack_table_UI" method="select_table"]
