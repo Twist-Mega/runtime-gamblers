@@ -15,19 +15,24 @@ enum State {
 }
 
 var current_state = State.READY
+var dialogue_queue = []
 var tween
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print("Starting state: State.READY")
 	hide_dialogue()
-	add_dialogue("Lorem ipsum and much adieu")
+	queue_dialogue("And if you'll only attend, kitty,")
+	queue_dialogue("And not talk so much")
+	queue_dialogue("I'll tell you all my ideas...")
+	queue_dialogue("About looking-glass house!")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	match current_state:
 		State.READY:
-			pass
+			if !dialogue_queue.is_empty():
+				display_dialogue()
 		State.READING:
 			if Input.is_action_just_pressed("ui_accept"):
 				text.visible_ratio = 1.0
@@ -38,6 +43,9 @@ func _process(delta: float) -> void:
 			if Input.is_action_just_pressed("ui_accept"):
 				change_state(State.READY)
 				hide_dialogue()
+				
+func queue_dialogue(next_dialogue):
+	dialogue_queue.push_back(next_dialogue)
 
 func show_dialogue():
 	dialogue_container.show()
@@ -47,13 +55,14 @@ func hide_dialogue():
 	advance_symbol.text = ""
 	dialogue_container.hide()
 
-func add_dialogue(next):
-	text.text = next
+func display_dialogue():
+	var next_dialogue = dialogue_queue.pop_front()
+	text.text = next_dialogue
 	text.visible_ratio = 0.0
 	change_state(State.READING)
 	show_dialogue()
 	tween = create_tween()
-	tween.tween_property(text, "visible_ratio", 1.0, len(next) * CHAR_READ_RATE).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(text, "visible_ratio", 1.0, len(next_dialogue) * CHAR_READ_RATE).set_trans(Tween.TRANS_LINEAR).set_ease(Tween.EASE_IN_OUT)
 	tween.finished.connect(_on_Tween_tween_all_completed)
 
 func _on_Tween_tween_all_completed():
