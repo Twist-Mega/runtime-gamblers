@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://nfnd2xup6qo0" path="res://scenes/table_blackjack.tscn" id="5_8repx"]
 [ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="5_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
-[ext_resource type="Script" path="res://scripts/wallet_hud.gd" id="7_wallet_hud"]
+[ext_resource type="Script" uid="uid://dwt6rbuiflrer" path="res://scripts/wallet_hud.gd" id="7_wallet_hud"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
 resource_name = "Casino Sheet"
@@ -97,7 +97,7 @@ texture = ExtResource("2_8repx")
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
 
-[node name="WalletAmount" type="Label" parent="UI_layer"]
+[node name="WalletAmount" type="Label" parent="UI_layer" unique_id=910196326]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -106,7 +106,6 @@ offset_top = 3.0
 offset_right = -4.0
 offset_bottom = 19.0
 grow_horizontal = 0
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.8431373, 0, 1)
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 2
@@ -138,7 +137,7 @@ press c to exit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayButton" type="Button" parent="UI_layer/blackjack_table_UI"]
+[node name="PlayButton" type="Button" parent="UI_layer/blackjack_table_UI" unique_id=357189554]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -227,7 +226,6 @@ position = Vector2(0, -191)
 position = Vector2(176, 0)
 script = ExtResource("4_ygfup")
 table_id = "blackjack_bottom_right"
-stake_amount = 5
 
 [node name="21MiddleRight" parent="BlackjackTables" unique_id=1577435322 instance=ExtResource("5_8repx")]
 position = Vector2(176, -96)
