@@ -1,15 +1,20 @@
 # Blackjack handoff
 
-Snapshot: 2026-10-22. Read this first when continuing blackjack development.
+Snapshot: 2026-10-23. Read this first when continuing blackjack development.
 This describes the current working files; check `git status` before editing.
 
 ## Scope and current work
 
 - Project: Runtime Gamblers, Godot 4.7 / GDScript (`.gd`), not Python.
-- Branch: `blackjack`. AI/display cleanup is committed, and development has been
-  merged locally. The standalone debug-window scaling fix is still uncommitted.
-- Development's gameworld, table interaction, and wallet are now present.
-  Connecting them to the playable blackjack session is still separate work.
+- Branch: `blackjack`. Development and the display scaling fixes are committed
+  and pushed. The approved wallet/gameworld integration and these documentation
+  updates are currently uncommitted; inspect `git status` before proceeding.
+- Work in small, explicitly approved pieces. Explain the proposed changes and
+  ask before implementing the next piece or batch. Do not expand the scope.
+- Only the right-side tables have blackjack interaction and UI. Do not add
+  interaction or scripts to the left tables without the user's approval.
+- The right-table green popup opens blackjack with the official Wallet. Leaving
+  or reaching a session limit returns to that popup's summary and Play Again.
 - Display cleanup: removed the subtitle, stake-selection prompts/buttons, and
   higher-stake unlock. The display shows `Stake: 5` and selects it automatically
   on launch, New Session, and reset. Preserve gameplay during further UI changes.
@@ -21,7 +26,7 @@ Human input -> Display -> Session controller -> Engine
                              |                    |
                           Wallet port       Rules/cards/AI
                              |
-                       Fake wallet (today)
+                   Official Wallet / debug fake wallet
 
 Command response -> ordered events -> visual playback -> final public snapshot
 ```
@@ -31,8 +36,10 @@ Command response -> ordered events -> visual playback -> final public snapshot
 | [blackjack_engine.gd](scripts/blackjack/blackjack_engine.gd) | One shared-deck table round: cards, scoring, turns, AI decisions, outcomes. `RefCounted`; no UI, timers, wallet, or lobby. |
 | [blackjack_session_controller.gd](scripts/blackjack/blackjack_session_controller.gd) | A table visit: stake selection, hand limit, legal actions, human money transactions, retries, summary, closing. Also `RefCounted`. |
 | [blackjack_wallet_port.gd](scripts/blackjack/blackjack_wallet_port.gd) | Abstract wallet interface: `get_balance()` and `apply_transaction(id, delta)`. |
+| [game_wallet_adapter.gd](scripts/blackjack/game_wallet_adapter.gd) + [wallet.gd](scripts/wallet.gd) | Read and transact against the official game's balance. Successful transaction IDs are recorded in Wallet for its application lifetime. |
+| [blackjack_table_UI.gd](scripts/blackjack/blackjack_table_UI.gd) + [gameworld.tscn](scenes/gameworld.tscn) | Existing right-table popup, Play/Play Again, overlay lifecycle, green summary, and C exit. |
 | [fake_wallet.gd](tests/blackjack/fake_wallet.gd) | Test-only balance and transaction ledger; supports simulated payment failures. |
-| [blackjack_debug.tscn](tests/blackjack/blackjack_debug.tscn) + [blackjack_debug.gd](tests/blackjack/blackjack_debug.gd) | Playable development screen, built programmatically with Controls. Creates its own session/fake wallet; displays public cards, actions, results, and logs. |
+| [blackjack_debug.tscn](tests/blackjack/blackjack_debug.tscn) + [blackjack_debug.gd](tests/blackjack/blackjack_debug.gd) | Display reused for standalone debug and gameworld play. Accepts a supplied wallet; otherwise creates a fake wallet. Displays public cards, actions, results, and logs. |
 | `tests/blackjack/test_blackjack_*.gd` | Engine, session, and real debug-scene tests. |
 
 Keep `.gd.uid` files with their scripts. `.godot/` is generated local data.
@@ -62,13 +69,36 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
   natural `stake + ceil(1.5 * stake)`. At stake 5, blackjack returns 13, profit 8.
 - One selected stake per session; default limit five rounds. Deduct one human
   stake per round, never all five upfront. Leaving is allowed before play or
-  between completed table rounds. Final summary waits for acknowledgement.
+  between completed table rounds. Standalone debug waits for summary
+  acknowledgement. Gameworld play automatically closes the session and hands
+  its summary to the green popup instead.
 - Human settlement and **whole-table completion are separate**. An early result
   can credit chips/count the human hand while AI still play. Next Hand, Leave,
   and session completion wait for the whole table and any pending payment.
 - Display automatically advances AI/dealer turns, speeds up after the human
   result is known, and highlights the active seat with an amber outline/name
   and lighter background. Highlight follows playback, including AI thinking time.
+
+## Approved gameworld flow
+
+- F5, approach a right-side table, X, Play, Start Hand. Uses the official game
+  Wallet (100 on a fresh launch), stake 5, up to five hands, and four AI chairs.
+- Play does not charge money. Each Start Hand deducts one stake; payouts use the
+  same balance shown in the game's pause menu. Play Again never resets money.
+- Leave Table, the five-hand limit, or insufficient funds automatically removes
+  the blackjack overlay and returns to the green popup. It shows Hands, Start,
+  End, and Net, plus Play Again. Play Again is disabled below the required stake.
+- Leaving before the first hand shows a zero-hand summary without a charge.
+- The world stays paused while blackjack or the green summary is open. C closes
+  only the green popup and resumes exploring. C does nothing inside blackjack.
+- The overlay's temporary scaling is restored before showing the green popup.
+  The left tables, project resolution, camera, and movement scripts are unchanged.
+- Gameworld play hides Next deal, Fail next return once, Reset test money,
+  New Session, the Testing tools heading, and the separate Close Session button.
+  Standalone debug keeps its tools and its own 1,000 fake-money balance.
+- Retry Return remains visible but disabled except during pending payments.
+  No genuine payout failures have been observed; fake-wallet tests inject them.
+  Showing this recovery control only when needed is an unresolved UI decision.
 
 ## Interfaces and important safeguards
 
@@ -80,6 +110,10 @@ do not include it in blackjack commits or delete it as part of UI cleanup.
 - Session: `open_blackjack(table_id)`, `select_stake(option_id)`,
   `start_next_hand(deck_order = [])`, `hit()`, `stand()`, `advance_table()`,
   `leave_table()`, `acknowledge_result()`, `retry_pending_transaction()`.
+- Display: call `configure_wallet(adapter)` before adding it to the tree.
+  Gameworld sets `manage_window_scaling` and `return_summary_to_host` to true
+  and listens for `session_closed(summary)` with a deferred connection. The view
+  acknowledges COMPLETE internally in this mode, after ordered playback finishes.
 - Pass table configuration explicitly: `{max_hands, ai_seats, stake_options}`.
   Debug configuration uses a fixed stake 5, selected automatically. The controller's legacy
   fallback table uses stake **2 and no AI**; do not assume its defaults match the demo.
@@ -104,9 +138,9 @@ results are data, not terminal output. The current plain cards are one renderer
 of that data; sprites and animations can replace it without rewriting the rules.
 
 Create a production Godot table scene with seat anchors, a deck position, card
-scenes/sprites, chip visuals, and input buttons. Give its view/controller adapter
-an existing session, rather than creating the debug screen's fake wallet and
-testing tools. That reusable injection layer is future work, not implemented yet.
+scenes/sprites, chip visuals, and input buttons. The current display already
+accepts a wallet adapter and is reused in the gameworld; extracting a separate
+production renderer or accepting an existing session is not implemented yet.
 
 For each accepted command, play its events **in order**:
 
@@ -120,7 +154,7 @@ For each accepted command, play its events **in order**:
 | `seat_settled` | Show that seat's outcome, including the human's early bust/blackjack. |
 | `wallet_transaction` | Update the displayed balance/animate human chips. Money is already handled by the session. |
 | `round_finished` | Present the finished table. Allow next-round actions only when the session permits them. |
-| `session_finished` / `session_closed` | Summary/acknowledgement, then a future lobby return. |
+| `session_finished` / `session_closed` | Standalone summary/acknowledgement, or automatic return to the gameworld's green summary popup. |
 
 The response snapshot is the state **after the entire command**, sometimes after
 several dealer draws. Do not render it before its event animations: that could
@@ -133,8 +167,9 @@ The current adapter examples are `_request`, `_play_events`, `_refresh_view`, an
 `_set_active_seat` in `blackjack_debug.gd`. Keep timing, sounds, Tweens, and sprites
 in the view/adapter. Engine/session commands stay synchronous and testable.
 
-Real wallet storage, reusable production view, lobby pause/return handling, and
-final artwork are still future work. The engine/session do not change scenes.
+The official wallet adapter, gameworld overlay, and green summary/return flow
+are implemented. Cross-launch wallet persistence, a separate production renderer,
+and final artwork remain future work. The engine/session do not change scenes.
 
 ## Running, timing, and tests
 
@@ -143,8 +178,9 @@ final artwork are still future work. The engine/session do not change scenes.
   then Hit/Stand. AI turns run automatically around yours.
 - Standalone debug play overrides window scaling to a 1280 × 720 canvas-item
   layout, restoring previous settings on exit. Development's 320 × 180 world
-  resolution and project pixel font remain unchanged. Embedded displays do not
-  override their host window.
+  resolution and project pixel font remain unchanged. The gameworld overlay
+  explicitly opts into the same temporary scaling override; other embedded
+  displays leave their host window alone.
 - Seat headings/totals stack and wrap; cards wrap within reserved column widths.
   Populating hands must not expand the table beyond the viewport.
 - **Test:** open `tests/blackjack/blackjack_tests.tscn`, press **F6**, read Output.
@@ -155,10 +191,18 @@ final artwork are still future work. The engine/session do not change scenes.
   embedded host settings, automatic stake selection,
   insufficient starting funds, shared-deck order, manual input,
   hidden-card privacy, early payment/retry, limits, event playback, pacing, and highlighting.
+- The user verified the gameworld flow manually on 2026-10-23: right-table Play,
+  official balance, green summary, Play Again, C exit, and pause-menu balance.
+- Additional local checks passed for wallet transactions, the adapter, supplied
+  wallet/display behavior, 107 green-summary checks (including five-hand and
+  insufficient-funds endings), and 15 testing-control visibility checks. Their
+  helper scripts/logs are under ignored `.godot/`; they are not permanent tests
+  in the three committed suites. Do not claim the runner covers gameworld flow.
 - Optional terminal command, when Godot is on PATH:
   `godot --headless --path . res://tests/blackjack/blackjack_tests.tscn`
 - Inspector exports on `BlackjackDebug`: starting balance, max hands, AI seats,
-  deal delay, first/subsequent AI move delays, fast-forward delay.
+  deal delay, first/subsequent AI move delays, fast-forward delay,
+  manage-window-scaling and return-summary-to-host switches.
 - **Script defaults:** deal 0.35 s; AI waits 1 s before its first move and 0.75 s
   before later moves in that turn; fast-forward 0.07 s once human outcome is known.
   AI Hit cards appear with the action without another card delay.

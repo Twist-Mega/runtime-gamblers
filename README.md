@@ -14,7 +14,31 @@ The [session controller](docs/blackjack_session_controller.md) manages selectabl
 stakes, up to five hands, leaving between hands, unlocks, and transactions through
 a wallet interface. Its tests use a fake wallet. A
 [development display](docs/blackjack_debug_display.md) supports manual play.
-The production wallet adapter, lobby integration, and final artwork remain future work.
+The gameworld reuses that display through an adapter to the official Wallet.
+Final artwork and saving money across application launches remain future work.
+
+## Play blackjack in the gameworld
+
+1. Press **F5** to run the gameworld.
+2. Approach a **right-side blackjack table** and press **X** to open the green popup.
+3. Click **Play**, then **Start Hand**. The stake is **5** per hand.
+4. Use **Hit** or **Stand**, then **Next Hand** to continue.
+5. **Leave Table**, five completed hands, or insufficient funds returns you to
+   the green popup with a summary: **Hands, Start, End, and Net**.
+6. Choose **Play Again** to start a new session with the current balance, or
+   press **C** on the green popup to resume exploring.
+
+The left tables have no blackjack interaction or UI yet. Gameworld play uses
+the official Wallet, which starts at 100 on a fresh launch and also supplies the
+pause menu's balance. Opening Play takes no money; Start Hand deducts one stake.
+Play Again is disabled when another stake is unaffordable. Leaving before the
+first hand returns a zero-hand summary without a charge.
+
+The world stays paused through blackjack and the green summary. C only exits
+the green popup; it does not abandon an active blackjack display. The overlay
+temporarily uses a 1280 x 720 UI layout and restores world scaling when it closes.
+Testing controls and New Session are hidden in gameworld play. **Retry Return**
+remains visible but is enabled only for a pending payout or refund.
 
 ## Play the development blackjack table
 
@@ -23,8 +47,8 @@ is already set to **5**. Click **Start Hand**, and use **Hit** or **Stand**. Bet
 choose **Next Hand** or **Leave Table**. Review the summary, then **Close Session**.
 
 Four AI chairs are occupied by default, two on each side. Their Hit/Stand moves
-advance automatically, waiting 1 second before an AI's first move and 0.75 seconds
-before later moves in its turn. Busts and confirmed blackjacks settle immediately, with
+advance automatically. The saved scene waits 2 seconds before an AI's first move
+and 1 second before later moves in its turn. Busts and confirmed blackjacks settle immediately, with
 faster playback until the rest of the table finishes. Other hands settle after
 the dealer. Edit the root's **Ai Seats** array in the Inspector before F6 to
 configure occupancy; an empty array gives the original single-player game.
@@ -62,3 +86,7 @@ and `.godot/blackjack-debug-tests.log`.
 Run these tests after changing blackjack rules, payouts, stakes, or session flow.
 They exercise the engine, session, and display automatically. For manual play,
 use `tests/blackjack/blackjack_debug.tscn`.
+
+The three suites above do not cover the complete gameworld interaction. Also
+manually check right table -> X -> Play -> hand -> green summary -> Play Again/C,
+and confirm that the balance carries over and agrees with the pause menu.

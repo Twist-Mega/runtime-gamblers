@@ -1,9 +1,12 @@
 extends Control
 ## Standalone development display. Rules and money flow stay in the controller.
 
+signal session_closed(summary: Dictionary)
+
 const Session = preload("res://scripts/blackjack/blackjack_session_controller.gd")
 const Rules = preload("res://scripts/blackjack/blackjack_engine.gd")
 const FakeWallet = preload("res://tests/blackjack/fake_wallet.gd")
+const WalletPort = preload("res://scripts/blackjack/blackjack_wallet_port.gd")
 const TABLE_ID = "development"
 const DEBUG_VIEW_SIZE = Vector2i(1280, 720)
 const STAKES = [
@@ -12,6 +15,8 @@ const STAKES = [
 const DEAL_MODES = ["Shuffled", "Player blackjack", "Hit to bust", "Push (stand)", "Dealer bust (stand)"]
 
 @export_range(0, 1000000, 1) var starting_balance: int = 1000
+@export var manage_window_scaling: bool = false
+@export var return_summary_to_host: bool = false
 @export_range(1, 100, 1) var max_hands: int = 5
 @export_range(0.0, 1.0, 0.05) var deal_delay: float = 0.35
 @export_range(0.0, 5.0, 0.05) var ai_first_move_delay: float = 1.0
@@ -20,7 +25,8 @@ const DEAL_MODES = ["Shuffled", "Player blackjack", "Hit to bust", "Push (stand)
 @export var ai_seats: Array[String] = ["left_2", "left_1", "right_1", "right_2"]
 
 var _session: Session
-var _wallet: FakeWallet
+var _wallet: WalletPort
+var _provided_wallet: WalletPort
 var _state: Dictionary = {}
 var _busy: bool = false
 var _displayed_cards: Dictionary = {"player": [], "dealer": []}
@@ -49,13 +55,25 @@ var _saved_window_scaling: Dictionary = {}
 func _ready() -> void:
 	_configure_debug_window()
 	_build_ui()
-	_reset_test_session()
+	if _provided_wallet != null:
+		_wallet = _provided_wallet
+		_start_session()
+	else:
+		_reset_test_session()
+
+
+## Supply a wallet before adding the display to the scene tree.
+func configure_wallet(wallet: WalletPort) -> bool:
+	if wallet == null or is_inside_tree():
+		return false
+	_provided_wallet = wallet
+	return true
 
 
 func _configure_debug_window() -> void:
 	# F6 should fit the debug UI without changing the pixel-art world's settings.
-	# An embedded table must leave its host window alone.
-	if get_parent() != get_tree().root:
+	# Embedded views only change scaling when their host explicitly opts in.
+	if not manage_window_scaling and get_parent() != get_tree().root:
 		return
 	var window := get_window()
 	_saved_window_scaling = {
@@ -121,6 +139,8 @@ func _build_ui() -> void:
 		var button := _button(entry[1], actions, _request.bind(entry[0]))
 		button.name = entry[0]
 		_buttons[entry[0]] = button
+	_buttons.acknowledge_result.visible = not return_summary_to_host
+	_buttons.open_blackjack.visible = _provided_wallet == null
 	_build_seat("dealer", "Dealer", content)
 	var table := HBoxContainer.new()
 	content.add_child(table)
@@ -139,8 +159,9 @@ func _build_ui() -> void:
 	table.add_child(right)
 	_build_seat("right_1", "AI - right inner", right)
 	_build_seat("right_2", "AI - right outer", right)
-	_label("Testing tools", content, 18)
+	_label("Testing tools", content, 18).visible = _provided_wallet == null
 	var tools := HFlowContainer.new()
+	tools.visible = _provided_wallet == null
 	content.add_child(tools)
 	_label("Next deal:", tools)
 	_mode = OptionButton.new()
@@ -212,9 +233,13 @@ func _build_seat(seat_id: String, title: String, parent: Node) -> void:
 
 
 func _reset_test_session() -> void:
-	if _busy:
+	if _busy or _provided_wallet != null:
 		return
 	_wallet = FakeWallet.new(starting_balance)
+	_start_session()
+
+
+func _start_session() -> void:
 	_mode.select(0)
 	_session = Session.new(_wallet, {TABLE_ID: {"max_hands": max_hands, "stake_options": STAKES,
 		"ai_seats": ai_seats}})
@@ -227,9 +252,9 @@ func _reset_test_session() -> void:
 
 
 func _fail_next_return() -> void:
-	if _busy:
+	if _busy or _provided_wallet != null:
 		return
-	_wallet.fail_next_credits = 1
+	(_wallet as FakeWallet).fail_next_credits = 1
 	_log_line("Testing: the next wallet return will fail once. Use Retry Return afterwards.")
 
 
@@ -250,6 +275,9 @@ func _request(action: String) -> void:
 		await _play_events(response.events)
 		_state = response.state
 		_refresh_view()
+		if return_summary_to_host and response.accepted and _state.phase == "COMPLETE":
+			response = _session.acknowledge_result()
+			continue
 		if response.accepted and _state.phase == "SELECTING_STAKE":
 			# Keep stake validation in the session, without a selection step in the UI.
 			response = _session.select_stake("starter")
@@ -263,6 +291,8 @@ func _request(action: String) -> void:
 		_log_line("Request rejected: " + response.error.message)
 	_busy = false
 	_sync_controls()
+	if response.accepted and _state.phase == "CLOSED":
+		session_closed.emit(_state.summary)
 
 
 func _play_events(events: Array) -> void:
@@ -420,9 +450,9 @@ func _sync_controls() -> void:
 	for action in _buttons:
 		_buttons[action].disabled = _busy or action not in legal
 	_buttons.start_next_hand.text = "Start Hand" if _state.get("hand_number", 0) == 0 else "Next Hand"
-	_mode.disabled = _busy or _state.get("phase") not in ["SELECTING_STAKE", "READY", "BETWEEN_HANDS", "CLOSED"]
-	_reset_button.disabled = _busy
-	_fail_button.disabled = _busy or _state.get("phase") not in ["READY", "PLAYING", "BETWEEN_HANDS"]
+	_mode.disabled = _provided_wallet != null or _busy or _state.get("phase") not in ["SELECTING_STAKE", "READY", "BETWEEN_HANDS", "CLOSED"]
+	_reset_button.disabled = _provided_wallet != null or _busy
+	_fail_button.disabled = _provided_wallet != null or _busy or _state.get("phase") not in ["READY", "PLAYING", "BETWEEN_HANDS"]
 
 
 func _draw_cards() -> void:
@@ -474,7 +504,7 @@ func _log_line(text: String) -> void:
 
 
 func _scenario_deck() -> Array:
-	if _mode.selected == 0:
+	if _provided_wallet != null or _mode.selected == 0:
 		return []
 	# Known development fixtures; these never enter the core rules or controller.
 	var prefixes := [
