@@ -49,7 +49,7 @@ Currently, successful output ends with:
 ```text
 Blackjack: 42 tests, 6391 checks, 0 failures.
 Blackjack sessions: 42 tests, 724 checks, 0 failures.
-Blackjack display: 17 tests, 235 checks, 0 failures.
+Blackjack display: 21 tests, 280 checks, 0 failures.
 Blackjack tests: ALL SUITES PASSED.
 ```
 

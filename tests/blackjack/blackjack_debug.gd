@@ -5,6 +5,7 @@ const Session = preload("res://scripts/blackjack/blackjack_session_controller.gd
 const Rules = preload("res://scripts/blackjack/blackjack_engine.gd")
 const FakeWallet = preload("res://tests/blackjack/fake_wallet.gd")
 const TABLE_ID = "development"
+const DEBUG_VIEW_SIZE = Vector2i(1280, 720)
 const STAKES = [
 	{"option_id": "starter", "label": "Starter", "amount": 5},
 ]
@@ -42,11 +43,38 @@ var _reset_button: Button
 var _fail_button: Button
 var _fast_forward: bool = false
 var _ai_moves_seen: Dictionary = {}
+var _saved_window_scaling: Dictionary = {}
 
 
 func _ready() -> void:
+	_configure_debug_window()
 	_build_ui()
 	_reset_test_session()
+
+
+func _configure_debug_window() -> void:
+	# F6 should fit the debug UI without changing the pixel-art world's settings.
+	# An embedded table must leave its host window alone.
+	if get_parent() != get_tree().root:
+		return
+	var window := get_window()
+	_saved_window_scaling = {
+		"content_scale_size": window.content_scale_size,
+		"content_scale_mode": window.content_scale_mode,
+		"content_scale_stretch": window.content_scale_stretch,
+	}
+	window.content_scale_size = DEBUG_VIEW_SIZE
+	window.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	window.content_scale_stretch = Window.CONTENT_SCALE_STRETCH_FRACTIONAL
+
+
+func _exit_tree() -> void:
+	if _saved_window_scaling.is_empty():
+		return
+	var window := get_window()
+	for property in _saved_window_scaling:
+		window.set(property, _saved_window_scaling[property])
+	_saved_window_scaling.clear()
 
 
 func _build_ui() -> void:
@@ -78,6 +106,7 @@ func _build_ui() -> void:
 	_progress_label = _label("", stats)
 	_stake_label = _label("", stats)
 	_status_label = _label("", content)
+	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_result_label = _label("", content)
 	_result_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_summary_label = _label("", content)
@@ -164,13 +193,17 @@ func _build_seat(seat_id: String, title: String, parent: Node) -> void:
 	parent.add_child(panel)
 	var column := VBoxContainer.new()
 	panel.add_child(column)
-	var heading := HBoxContainer.new()
+	# Stack and wrap headings so longer totals cannot widen the whole table.
+	var heading := VBoxContainer.new()
 	column.add_child(heading)
 	var label := _label(title, heading, 18)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_seat_titles[seat_id] = label
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_total_labels[seat_id] = _label("No cards", heading)
+	_total_labels[seat_id].autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var cards := HFlowContainer.new()
+	cards.custom_minimum_size.x = 64 if seat_id in Rules.AI_SEATS else 82
 	cards.custom_minimum_size.y = 72 if seat_id in Rules.AI_SEATS else 88
 	cards.add_theme_constant_override("h_separation", 8)
 	column.add_child(cards)
@@ -407,6 +440,7 @@ func _draw_cards() -> void:
 			panel.add_theme_stylebox_override("panel", style)
 			row.add_child(panel)
 			var label := _label(_card_text(card), panel, 14 if seat_id in Rules.AI_SEATS else 18)
+			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			label.add_theme_color_override("font_color", Color("18283b") if card.face_up else Color("ffffff"))

@@ -89,6 +89,63 @@ func test_initial_controls_with_automatic_stake() -> bool:
 	return true
 
 
+func test_standalone_scaling_fits_ui_and_restores_world_settings() -> bool:
+	var original_size := root.content_scale_size
+	var original_mode := root.content_scale_mode
+	var original_stretch := root.content_scale_stretch
+	var view: Control = await _view()
+	_equal(root.content_scale_size, Vector2i(1280, 720), "Debug scene uses its own UI resolution")
+	_equal(root.content_scale_mode, Window.CONTENT_SCALE_MODE_CANVAS_ITEMS, "UI draws at window resolution")
+	_equal(root.content_scale_stretch, Window.CONTENT_SCALE_STRETCH_FRACTIONAL, "UI can fit non-integer window sizes")
+	_check(view.size.x >= 1280 and view.size.y >= 720, "Table receives the full debug layout area")
+	for panel in view._seat_panels.values():
+		_check(panel.get_global_rect().end.x <= view.get_global_rect().end.x, "Seat panel fits horizontally: %s" % panel.get_global_rect())
+	await _dispose(view)
+	_equal(root.content_scale_size, original_size, "Leaving restores world resolution")
+	_equal(root.content_scale_mode, original_mode, "Leaving restores world rendering mode")
+	_equal(root.content_scale_stretch, original_stretch, "Leaving restores world integer scaling")
+	return true
+
+
+func test_embedded_display_preserves_host_window_scaling() -> bool:
+	var original_size := root.content_scale_size
+	var original_mode := root.content_scale_mode
+	var original_stretch := root.content_scale_stretch
+	var host := Control.new()
+	root.add_child(host)
+	var view: Control = DebugScene.instantiate()
+	host.add_child(view)
+	await process_frame
+	await _idle(view)
+	_equal(root.content_scale_size, original_size, "Embedded table keeps host resolution")
+	_equal(root.content_scale_mode, original_mode, "Embedded table keeps host rendering mode")
+	_equal(root.content_scale_stretch, original_stretch, "Embedded table keeps host scaling")
+	host.queue_free()
+	await process_frame
+	return true
+
+
+func test_populated_table_stays_inside_view_during_playback() -> bool:
+	var view: Control = await _view(1000, 0.01, ["left_2", "left_1", "right_1", "right_2"])
+	view._mode.select(3)
+	var overflow := ""
+	for action in ["start_next_hand", "hit", "stand"]:
+		view._buttons[action].pressed.emit()
+		for frame in range(300):
+			await process_frame
+			for seat_id in view._seat_panels:
+				var panel: Control = view._seat_panels[seat_id]
+				if panel.get_global_rect().end.x > view.get_global_rect().end.x + 1:
+					overflow = "%s extends to %s beyond viewport %s" % [seat_id, panel.get_global_rect().end.x, view.get_global_rect().end.x]
+			if not view._busy:
+				break
+		await _idle(view)
+	_equal(overflow, "", "Populated seats fit throughout dealing, hitting, and settlement")
+	_equal(view._state.phase, "BETWEEN_HANDS", "Layout check plays a complete table round")
+	await _dispose(view)
+	return true
+
+
 func test_automatic_stake_rejects_insufficient_funds() -> bool:
 	var view: Control = await _view(4)
 	_equal(view._state.selected_stake, null, "Unaffordable stake remains unselected")

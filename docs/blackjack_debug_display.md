@@ -31,6 +31,15 @@ Dealer cards show a face-down placeholder until revealed; totals, hand progress,
 individual moves, money transfers, payouts, and the final summary are displayed.
 The whole page can scroll if the game window is small.
 
+When run standalone with F6, the debug scene uses a 1280 × 720 UI layout and
+canvas-item scaling. This avoids enlarging development's 320 × 180 world viewport
+over the debug controls. The override is runtime-only and restores the previous
+window settings when the display exits; an embedded display leaves its host
+window unchanged. The project's default pixel font is still inherited. A future
+in-game table will need its own UI layout/rendering integration.
+Seat names and totals stack and wrap within each column. Cards wrap into more
+rows as hands grow, so dealing and settlement do not push the right seats offscreen.
+
 ## Repeatable checks
 
 The **Next deal** selector affects the next hand only:

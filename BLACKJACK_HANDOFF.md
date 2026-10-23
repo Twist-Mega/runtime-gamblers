@@ -1,16 +1,15 @@
 # Blackjack handoff
 
-Snapshot: 2026-10-20. Read this first when continuing blackjack development.
+Snapshot: 2026-10-22. Read this first when continuing blackjack development.
 This describes the current working files; check `git status` before editing.
 
 ## Scope and current work
 
 - Project: Runtime Gamblers, Godot 4.7 / GDScript (`.gd`), not Python.
-- Branch: `blackjack`. At this snapshot, AI/display changes are still uncommitted.
-  A new chat using this same folder can read them without a commit or push.
-- Lobby integration is **on hold** pending the updated lobby in `development`.
-  Earlier lobby/table-menu work is absent from this branch; do not restore it or
-  merge another branch as part of blackjack display work.
+- Branch: `blackjack`. AI/display cleanup is committed, and development has been
+  merged locally. The standalone debug-window scaling fix is still uncommitted.
+- Development's gameworld, table interaction, and wallet are now present.
+  Connecting them to the playable blackjack session is still separate work.
 - Display cleanup: removed the subtitle, stake-selection prompts/buttons, and
   higher-stake unlock. The display shows `Stake: 5` and selects it automatically
   on launch, New Session, and reset. Preserve gameplay during further UI changes.
@@ -140,12 +139,20 @@ final artwork are still future work. The engine/session do not change scenes.
 ## Running, timing, and tests
 
 - **Play:** open `tests/blackjack/blackjack_debug.tscn`, press **F6**. This branch
-  has no assigned main scene, so F5 may prompt for one. Click Start Hand,
+  now uses development's gameworld as its main scene for F5. Click Start Hand,
   then Hit/Stand. AI turns run automatically around yours.
+- Standalone debug play overrides window scaling to a 1280 × 720 canvas-item
+  layout, restoring previous settings on exit. Development's 320 × 180 world
+  resolution and project pixel font remain unchanged. Embedded displays do not
+  override their host window.
+- Seat headings/totals stack and wrap; cards wrap within reserved column widths.
+  Populating hands must not expand the table beyond the viewport.
 - **Test:** open `tests/blackjack/blackjack_tests.tscn`, press **F6**, read Output.
   It runs automated tests and closes; it is not the playable scene.
 - Last verified suites: engine **42 tests / 6391 checks**, session **42 / 724**,
-  display **18 / 259**, all passing. Tests cover automatic stake selection,
+  display **21 / 280**, all passing. Tests cover populated-table bounds during
+  dealing/hitting/settlement, standalone scaling/restoration,
+  embedded host settings, automatic stake selection,
   insufficient starting funds, shared-deck order, manual input,
   hidden-card privacy, early payment/retry, limits, event playback, pacing, and highlighting.
 - Optional terminal command, when Godot is on PATH:
