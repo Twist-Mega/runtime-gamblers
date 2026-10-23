@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameState="*uid://dk0je31xujpep"
 Wallet="*uid://sslr2xyxg1a0"
+DialogueBox="*uid://b23ffqcnaj3n8"
 
 [display]
 
