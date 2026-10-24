@@ -32,7 +32,7 @@ func _process(delta: float) -> void:
 			if Input.is_action_just_pressed("ui_accept"):
 				text.visible_ratio = 1.0
 				tween.kill()
-				advance_symbol.text = "$"
+				advance_symbol.modulate.a = 1.0
 				change_state(State.FINISHED)
 		State.FINISHED:
 			if Input.is_action_just_pressed("ui_accept"):
@@ -61,13 +61,14 @@ func show_dialogue():
 
 func hide_dialogue():
 	text.text = ""
-	advance_symbol.text = ""
+	advance_symbol.modulate.a = 0.0
 	dialogue_container.hide()
 
 func display_dialogue():
 	var next_dialogue = dialogue_queue.pop_front()
 	text.text = next_dialogue
 	text.visible_ratio = 0.0
+	advance_symbol.modulate.a = 0.0
 	change_state(State.READING)
 	show_dialogue()
 	tween = create_tween()
@@ -75,7 +76,7 @@ func display_dialogue():
 	tween.finished.connect(_on_Tween_tween_all_completed)
 
 func _on_Tween_tween_all_completed():
-	advance_symbol.text = "$"
+	advance_symbol.modulate.a = 1.0
 	change_state(State.FINISHED)
 
 func change_state(next_state):

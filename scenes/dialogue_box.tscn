@@ -2,19 +2,14 @@
 
 [ext_resource type="Script" uid="uid://btufd3cly4rhe" path="res://scenes/dialogue_box.gd" id="1_fu8b5"]
 [ext_resource type="FontFile" uid="uid://cccpkref0tdc" path="res://assets/fonts/(pixel font)prstartk.ttf" id="1_rc1id"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c2y4s"]
-bg_color = Color(0, 0, 0, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 1, 1, 1)
+[ext_resource type="Texture2D" uid="uid://vjxw2mp7jocc" path="res://assets/ui/ui_wallet_frame.png" id="2_hvmm2"]
+[ext_resource type="Texture2D" uid="uid://m4ofejpfbb8t" path="res://assets/ui/ui_dialogue_arrow.png" id="4_p0wdv"]
 
 [node name="DialogueBox" type="CanvasLayer" unique_id=102489367]
 script = ExtResource("1_fu8b5")
 
 [node name="DialogueContainer" type="MarginContainer" parent="." unique_id=932125359]
+texture_filter = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -23,9 +18,13 @@ offset_top = -95.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="Panel" type="Panel" parent="DialogueContainer" unique_id=446265501]
+[node name="Panel" type="NinePatchRect" parent="DialogueContainer" unique_id=130962255]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_c2y4s")
+texture = ExtResource("2_hvmm2")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
 
 [node name="MarginContainer" type="MarginContainer" parent="DialogueContainer" unique_id=569066654]
 layout_mode = 2
@@ -48,10 +47,9 @@ theme_override_font_sizes/font_size = 11
 text = "All your base are belong to us."
 autowrap_mode = 3
 
-[node name="Advance" type="Label" parent="DialogueContainer/MarginContainer/HBoxContainer" unique_id=977451806]
+[node name="Advance" type="TextureRect" parent="DialogueContainer/MarginContainer/HBoxContainer" unique_id=1726038647]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("1_rc1id")
-theme_override_font_sizes/font_size = 11
-text = "$"
+texture = ExtResource("4_p0wdv")
+stretch_mode = 2
