@@ -1,11 +1,26 @@
 [gd_scene format=3 uid="uid://bv67q73lm4rco"]
 
 [ext_resource type="Script" uid="uid://cl2na8kahkv5i" path="res://scenes/dealer_npc.gd" id="1_vn8g1"]
-[ext_resource type="SpriteFrames" uid="uid://bf7ncdeq2kf4u" path="res://assets/characters/security/guard1_player_walk.tres" id="2_nrxj7"]
+[ext_resource type="Texture2D" uid="uid://x3q436c4e0os" path="res://art_source/characters/dealer_walk.png" id="2_vn8g1"]
 [ext_resource type="Texture2D" uid="uid://cefuogg1vivgx" path="res://assets/ui/ui_prompt_interact.png" id="3_kx76o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hjhlk"]
 size = Vector2(20, 22)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nrxj7"]
+atlas = ExtResource("2_vn8g1")
+region = Rect2(0, 0, 18, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_its0e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nrxj7")
+}],
+"loop": 0,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_daudc"]
 size = Vector2(20, 6)
@@ -22,8 +37,8 @@ shape = SubResource("RectangleShape2D_hjhlk")
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1683244157]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=395838798]
-sprite_frames = ExtResource("2_nrxj7")
-frame_progress = 0.31591114
+sprite_frames = SubResource("SpriteFrames_its0e")
+autoplay = "default"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=52387389]
 position = Vector2(0, 8)
