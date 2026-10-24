@@ -272,45 +272,58 @@ lines = Array[String](["Don't go causin' trouble in here, punk."])
 
 [node name="leftd_guard2" parent="Characters" unique_id=1685039934 instance=ExtResource("6_667gv")]
 position = Vector2(-48, -96)
+lines = Array[String](["Alright, Mitch, just gotta look busy...", "Hey, you there! Stop lookin' suspicious!"])
 
 [node name="leftd_guard3" parent="Characters" unique_id=115458663 instance=ExtResource("6_667gv")]
 position = Vector2(-64, -184)
+lines = Array[String](["Phew, here all day again...", "Can't a guy see his wife and kids?"])
 
 [node name="leftd_guard4" parent="Characters" unique_id=154986728 instance=ExtResource("6_667gv")]
 position = Vector2(-201, -184)
+lines = Array[String](["I am error!"])
 
 [node name="leftd_guard5" parent="Characters" unique_id=942376734 instance=ExtResource("6_667gv")]
 position = Vector2(-160, 32)
+lines = Array[String](["Sheesh, that guy was a lunatic.", "Had to drag him out kickin' and screamin'..."])
 
 [node name="leftd_guard6" parent="Characters" unique_id=824002041 instance=ExtResource("6_667gv")]
 position = Vector2(-136, -32)
+lines = Array[String](["Don't know what's worse, this or retail..."])
 
 [node name="leftd_guard7" parent="Characters" unique_id=104065194 instance=ExtResource("6_667gv")]
 position = Vector2(-72, -32)
+lines = Array[String](["New around here, aren't ya'?"])
 
 [node name="leftd_guard8" parent="Characters" unique_id=704967501 instance=ExtResource("6_667gv")]
 position = Vector2(-136, -144)
+lines = Array[String](["They say the house always wins, but you never know, right?"])
 
 [node name="leftd_guard9" parent="Characters" unique_id=1132139850 instance=ExtResource("6_667gv")]
 position = Vector2(56, -144)
+lines = Array[String](["Mind your own business."])
 
 [node name="leftd_guard10" parent="Characters" unique_id=36944931 instance=ExtResource("6_667gv")]
 position = Vector2(120, -144)
+lines = Array[String](["You're not with 'those' guys, are ya'?", "Eh, not like you'll talk.", "First rule of Fight Club and all that.", "Either way, watch yourself."])
 
 [node name="leftd_guard11" parent="Characters" unique_id=1520244388 instance=ExtResource("6_667gv")]
 position = Vector2(120, -40)
 
 [node name="leftd_guard12" parent="Characters" unique_id=783737068 instance=ExtResource("6_667gv")]
 position = Vector2(120, -40)
+lines = Array[String](["No funny business, capiche?"])
 
 [node name="leftd_guard13" parent="Characters" unique_id=260325776 instance=ExtResource("6_667gv")]
 position = Vector2(56, -40)
+lines = Array[String](["Go on, step right up."])
 
 [node name="leftd_guard14" parent="Characters" unique_id=1962911827 instance=ExtResource("6_667gv")]
 position = Vector2(144, 32)
+lines = Array[String](["I could go for a quesadilla..."])
 
 [node name="rightd_guard" parent="Characters" unique_id=1683577118 instance=ExtResource("6_667gv")]
 position = Vector2(31, 65)
+lines = Array[String](["You seen the game last night?", "Crazy stuff!", "Doin' my job? Who are you to talk?"])
 
 [connection signal="table_selected" from="BlackjackTables/21BottomRight" to="UI_layer/blackjack_table_UI" method="select_table"]
 [connection signal="table_selected" from="BlackjackTables/21MiddleRight" to="UI_layer/blackjack_table_UI" method="select_table"]
