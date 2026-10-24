@@ -3,14 +3,20 @@
 [ext_resource type="Script" uid="uid://b60218axke4xo" path="res://scenes/security_npc.gd" id="1_b5sn2"]
 [ext_resource type="SpriteFrames" uid="uid://bf7ncdeq2kf4u" path="res://assets/characters/security/guard1_player_walk.tres" id="1_hjhlk"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_daudc"]
-size = Vector2(20, 6)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hjhlk"]
 size = Vector2(20, 22)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_daudc"]
+size = Vector2(20, 6)
+
 [node name="SecurityNPC" type="Node2D" unique_id=134451354]
 script = ExtResource("1_b5sn2")
+
+[node name="TalkZone" type="Area2D" parent="." unique_id=1955243989]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TalkZone" unique_id=1355487653]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_hjhlk")
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1683244157]
 
@@ -21,9 +27,3 @@ frame_progress = 0.31591114
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=52387389]
 position = Vector2(0, 8)
 shape = SubResource("RectangleShape2D_daudc")
-
-[node name="TalkZone" type="Area2D" parent="CharacterBody2D" unique_id=1955243989]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D/TalkZone" unique_id=1355487653]
-position = Vector2(0, -1)
-shape = SubResource("RectangleShape2D_hjhlk")

@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends Node2D
 # Attach to the root of security_npc.tscn.
 # Needs an Area2D child named "TalkZone" with a CollisionShape2D under it.
 # Fill in `lines` on each guard in the Inspector for unique dialogue.

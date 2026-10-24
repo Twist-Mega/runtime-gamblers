@@ -268,6 +268,7 @@ position = Vector2(33, 27)
 
 [node name="leftd_guard" parent="Characters" unique_id=134451354 instance=ExtResource("6_667gv")]
 position = Vector2(-32, 65)
+lines = Array[String](["Don't go causin' trouble in here, punk."])
 
 [node name="leftd_guard2" parent="Characters" unique_id=1685039934 instance=ExtResource("6_667gv")]
 position = Vector2(-48, -96)
