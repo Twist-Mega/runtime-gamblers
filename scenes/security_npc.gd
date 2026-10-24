@@ -1,7 +1,4 @@
 extends Node2D
-# Attach to the root of security_npc.tscn.
-# Needs an Area2D child named "TalkZone" with a CollisionShape2D under it.
-# Fill in `lines` on each guard in the Inspector for unique dialogue.
 
 @export var lines: Array[String] = ["..."]
 
@@ -9,8 +6,6 @@ extends Node2D
 
 var player_in_range := false
 
-# Optional icon shown above the guard when you can talk to them.
-# Add a Sprite2D named "InteractPrompt" to the NPC (safe to skip).
 @onready var prompt: Node2D = find_child("InteractPrompt", true, false)
 
 func _ready() -> void:
