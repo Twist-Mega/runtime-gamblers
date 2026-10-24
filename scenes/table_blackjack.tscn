@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://nfnd2xup6qo0"]
 
-[ext_resource type="Texture2D" uid="uid://ryf4frqyddju" path="res://assets/props/prop_blackjacktable.png" id="1_ht4xr"]
+[ext_resource type="Texture2D" uid="uid://dj21y5blxelax" path="res://assets/props/prop_HARDblackjacktable.png" id="1_ht4xr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hoypx"]
 size = Vector2(39, 19)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cjbcc"]
-size = Vector2(17, 8.75)
+size = Vector2(38, 17)
 
 [node name="Node2D" type="Node2D" unique_id=690257170]
 
@@ -18,11 +18,12 @@ scale = Vector2(1.28, 1.28)
 texture = ExtResource("1_ht4xr")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TableBlackjack" unique_id=569854597]
+visible = false
 position = Vector2(-0.5, -0.5)
 shape = SubResource("RectangleShape2D_hoypx")
 
 [node name="interact_zone" type="Area2D" parent="." unique_id=2090079226]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="interact_zone" unique_id=918273315]
-position = Vector2(-2, 8.625)
+position = Vector2(-2, -2)
 shape = SubResource("RectangleShape2D_cjbcc")

@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://b23ffqcnaj3n8"]
+
+[ext_resource type="Script" uid="uid://btufd3cly4rhe" path="res://scenes/dialogue_box.gd" id="1_fu8b5"]
+[ext_resource type="FontFile" uid="uid://cccpkref0tdc" path="res://assets/fonts/(pixel font)prstartk.ttf" id="1_rc1id"]
+[ext_resource type="Texture2D" uid="uid://vjxw2mp7jocc" path="res://assets/ui/ui_wallet_frame.png" id="2_hvmm2"]
+[ext_resource type="Texture2D" uid="uid://m4ofejpfbb8t" path="res://assets/ui/ui_dialogue_arrow.png" id="4_p0wdv"]
+
+[node name="DialogueBox" type="CanvasLayer" unique_id=102489367]
+script = ExtResource("1_fu8b5")
+
+[node name="DialogueContainer" type="MarginContainer" parent="." unique_id=932125359]
+texture_filter = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 6.0
+offset_bottom = 66.0
+grow_horizontal = 2
+
+[node name="Panel" type="NinePatchRect" parent="DialogueContainer" unique_id=130962255]
+layout_mode = 2
+texture = ExtResource("2_hvmm2")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="DialogueContainer" unique_id=569066654]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DialogueContainer/MarginContainer" unique_id=1082527049]
+layout_mode = 2
+
+[node name="Text" type="Label" parent="DialogueContainer/MarginContainer/HBoxContainer" unique_id=1856812091]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(175, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("1_rc1id")
+theme_override_font_sizes/font_size = 10
+text = "All your base are belong to us."
+autowrap_mode = 3
+
+[node name="Advance" type="TextureRect" parent="DialogueContainer/MarginContainer/HBoxContainer" unique_id=1726038647]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 8
+texture = ExtResource("4_p0wdv")
+stretch_mode = 2
