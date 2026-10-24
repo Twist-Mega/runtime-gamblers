@@ -29,15 +29,19 @@ func _process(delta: float) -> void:
 			if !dialogue_queue.is_empty():
 				display_dialogue()
 		State.READING:
-			if Input.is_action_just_pressed("ui_accept"):
+			if advance_pressed():
 				text.visible_ratio = 1.0
 				tween.kill()
 				advance_symbol.modulate.a = 1.0
 				change_state(State.FINISHED)
 		State.FINISHED:
-			if Input.is_action_just_pressed("ui_accept"):
+			if advance_pressed():
 				change_state(State.READY)
 				hide_dialogue()
+
+# True when the player presses a button that skips/advances dialogue
+func advance_pressed() -> bool:
+	return Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("interact")
 
 # --- Public API (call these from NPCs/objects) ---
 
