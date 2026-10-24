@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="5_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
 [ext_resource type="Script" uid="uid://dwt6rbuiflrer" path="res://scripts/wallet_hud.gd" id="7_wallet_hud"]
+[ext_resource type="PackedScene" uid="uid://bv67q73lm4rco" path="res://scenes/dealer_npc.tscn" id="12_28lvv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
 resource_name = "Casino Sheet"
@@ -324,6 +325,30 @@ lines = Array[String](["I could go for a quesadilla..."])
 [node name="rightd_guard" parent="Characters" unique_id=1683577118 instance=ExtResource("6_667gv")]
 position = Vector2(31, 65)
 lines = Array[String](["You seen the game last night?", "Crazy stuff!", "Doin' my job? Who are you to talk?"])
+
+[node name="topleft_dealer" parent="Characters" unique_id=809234413 instance=ExtResource("12_28lvv")]
+position = Vector2(-88, -159)
+lines = Array[String](["Ready to play?"])
+
+[node name="topright_dealer" parent="Characters" unique_id=1226957879 instance=ExtResource("12_28lvv")]
+position = Vector2(88, -160)
+lines = Array[String](["Ready to play?"])
+
+[node name="midleft_dealer" parent="Characters" unique_id=795098281 instance=ExtResource("12_28lvv")]
+position = Vector2(-87, -65)
+lines = Array[String](["Ready to play?"])
+
+[node name="midright_dealer" parent="Characters" unique_id=1763143995 instance=ExtResource("12_28lvv")]
+position = Vector2(88, -64)
+lines = Array[String](["Ready to play?"])
+
+[node name="bottomleft_dealer" parent="Characters" unique_id=736679552 instance=ExtResource("12_28lvv")]
+position = Vector2(-86, 31)
+lines = Array[String](["Ready to play?"])
+
+[node name="bottomright_dealer" parent="Characters" unique_id=641561517 instance=ExtResource("12_28lvv")]
+position = Vector2(88, 33)
+lines = Array[String](["Ready to play?"])
 
 [connection signal="table_selected" from="BlackjackTables/21BottomRight" to="UI_layer/blackjack_table_UI" method="select_table"]
 [connection signal="table_selected" from="BlackjackTables/21MiddleRight" to="UI_layer/blackjack_table_UI" method="select_table"]
