@@ -1,0 +1,95 @@
+[gd_resource type="SpriteFrames" load_steps=14 format=3]
+
+[ext_resource type="Texture2D" path="res://spritesheet.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="atlas_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_1"]
+atlas = ExtResource("1")
+region = Rect2(18, 0, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_2"]
+atlas = ExtResource("1")
+region = Rect2(36, 0, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_3"]
+atlas = ExtResource("1")
+region = Rect2(54, 0, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_4"]
+atlas = ExtResource("1")
+region = Rect2(0, 24, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_5"]
+atlas = ExtResource("1")
+region = Rect2(18, 24, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_6"]
+atlas = ExtResource("1")
+region = Rect2(36, 24, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_7"]
+atlas = ExtResource("1")
+region = Rect2(54, 24, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_8"]
+atlas = ExtResource("1")
+region = Rect2(0, 48, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_9"]
+atlas = ExtResource("1")
+region = Rect2(18, 48, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_10"]
+atlas = ExtResource("1")
+region = Rect2(36, 48, 18, 24)
+
+[sub_resource type="AtlasTexture" id="atlas_11"]
+atlas = ExtResource("1")
+region = Rect2(54, 48, 18, 24)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("atlas_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_9")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_10")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_11")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]
