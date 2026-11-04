@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bymjvu5pk5fo4"]
 
 [ext_resource type="Texture2D" uid="uid://bfi14wyhx461e" path="res://assets/placeholder_poker_table.png" id="1_bx4wl"]
-[ext_resource type="Script" uid="uid://c5a21x33ckqyd" path="res://scripts/poker_table.gd" id="1_ox824"]
+[ext_resource type="Script" uid="uid://c5a21x33ckqyd" path="res://scripts/blackjack/blackjack_table.gd" id="1_ox824"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_eojjc"]
 radius = 24.0

@@ -6,6 +6,13 @@ const SPEED = 64.0
 @onready var mainChar_animation: AnimatedSprite2D = $sprite
 
 func _physics_process(delta: float) -> void:
+	#player can't move while talking to npc
+	if DialogueBox.is_busy():
+		velocity = Vector2.ZERO
+		mainChar_animation.play("default")
+		move_and_slide()
+		return
+
 	process_movement()
 	move_and_slide()
 

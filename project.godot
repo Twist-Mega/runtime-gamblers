@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*uid://dk0je31xujpep"
+Wallet="*uid://sslr2xyxg1a0"
+DialogueBox="*uid://b23ffqcnaj3n8"
 
 [display]
 
@@ -33,9 +35,13 @@ window/stretch/scale_mode="integer"
 
 project/assembly_name="Runtime Gamblers"
 
+[global_group]
+
+player=""
+
 [gui]
 
-theme/custom_font="uid://b4rudpb08fwup"
+theme/custom_font="uid://cccpkref0tdc"
 
 [input]
 
