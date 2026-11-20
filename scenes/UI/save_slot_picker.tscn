@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://bgkylm08fdpbe"]
+
+[node name="SaveSlotPicker" type="Node2D" unique_id=2040992932]
+
+[node name="SlotPicker" type="ColorRect" parent="." unique_id=1066762242]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 306.0
+offset_bottom = 169.0
+color = Color(0.32138333, 0.55, 0.31350002, 1)
+
+[node name="Label" type="Label" parent="SlotPicker" unique_id=1235069405]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 318.0
+offset_bottom = 31.0
+scale = Vector2(0.885, 0.885)
+text = "Choose a save slot:"
+
+[node name="SlotList" type="VBoxContainer" parent="SlotPicker" unique_id=1855142373]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 33.0
+offset_right = 287.0
+offset_bottom = 143.0
+alignment = 1
+
+[node name="Slot1Button" type="Button" parent="SlotPicker/SlotList" unique_id=1890049780]
+layout_mode = 2
+
+[node name="Slot2Button" type="Button" parent="SlotPicker/SlotList" unique_id=1931117875]
+layout_mode = 2
+
+[node name="Slot3Button" type="Button" parent="SlotPicker/SlotList" unique_id=208046326]
+layout_mode = 2
+
+[node name="Slot4Button" type="Button" parent="SlotPicker/SlotList" unique_id=458036636]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="SlotPicker" unique_id=1329905574]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 146.00002
+offset_right = 346.0
+offset_bottom = 162.00002
+scale = Vector2(0.535, 0.535)
+text = "(press c to exit)"

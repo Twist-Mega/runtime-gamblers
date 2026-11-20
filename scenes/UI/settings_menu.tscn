@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://mqg65gybrknt"]
+
+[node name="settings_menu" type="Node2D" unique_id=575062875]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=320607539]
+offset_right = 322.0
+offset_bottom = 180.0
+color = Color(0.31, 0.31, 0.31, 1)

@@ -8,9 +8,8 @@
 [ext_resource type="Script" uid="uid://dvswchvi0um0x" path="res://scripts/bar/bar_UI.gd" id="4_wrnkp"]
 [ext_resource type="Script" uid="uid://c5a21x33ckqyd" path="res://scripts/blackjack/blackjack_table.gd" id="4_ygfup"]
 [ext_resource type="PackedScene" uid="uid://nfnd2xup6qo0" path="res://scenes/table_blackjack.tscn" id="5_8repx"]
-[ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause_menu.gd" id="5_28lvv"]
+[ext_resource type="PackedScene" uid="uid://bgfr1t8c4vtjr" path="res://scenes/UI/pause_menu.tscn" id="6_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
-[ext_resource type="Script" uid="uid://dwt6rbuiflrer" path="res://scripts/wallet_hud.gd" id="7_wallet_hud"]
 [ext_resource type="PackedScene" uid="uid://bv67q73lm4rco" path="res://scenes/dealer_npc.tscn" id="12_28lvv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
@@ -98,22 +97,9 @@ texture = ExtResource("2_8repx")
 
 [node name="UI_layer" type="CanvasLayer" parent="." unique_id=854043451]
 
-[node name="WalletAmount" type="Label" parent="UI_layer" unique_id=910196326]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -150.0
-offset_top = 3.0
-offset_right = -4.0
-offset_bottom = 19.0
-grow_horizontal = 0
-theme_override_colors/font_color = Color(1, 0.8431373, 0, 1)
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 2
-script = ExtResource("7_wallet_hud")
-
 [node name="blackjack_table_UI" type="ColorRect" parent="UI_layer" unique_id=893293503]
 process_mode = 2
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -155,6 +141,7 @@ text = "Play"
 
 [node name="bar_UI" type="ColorRect" parent="UI_layer" unique_id=2018191039]
 process_mode = 2
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -178,39 +165,7 @@ press c to exit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="pause_menu" type="ColorRect" parent="UI_layer" unique_id=778600310]
-process_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 5.0
-offset_right = -11.0
-offset_bottom = -5.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.2051174, 0.20511746, 0.20511737, 1)
-script = ExtResource("5_28lvv")
-
-[node name="Label" type="Label" parent="UI_layer/pause_menu" unique_id=1743739260]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 22.0
-offset_right = 366.0
-offset_bottom = 146.0
-scale = Vector2(0.5, 0.5)
-text = "Game Paused
-
-money:"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="MoneyLabel" type="Label" parent="UI_layer/pause_menu" unique_id=1040020934]
-layout_mode = 0
-offset_left = 116.0
-offset_top = 71.0
-offset_right = 156.0
-offset_bottom = 87.0
+[node name="PauseMenu" parent="UI_layer" unique_id=1495685442 instance=ExtResource("6_28lvv")]
 
 [node name="BlackjackTables" parent="." unique_id=690257170 instance=ExtResource("5_8repx")]
 position = Vector2(-86, 54)

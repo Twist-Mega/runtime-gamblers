@@ -1,7 +1,7 @@
-extends ColorRect
+extends CanvasLayer
 
 #for displaying money in pause menu
-@onready var money_label: Label = $MoneyLabel
+@onready var money_label: Label = %MoneyLabel
 
 #updates money label in pause menu
 func _update_money(amount: int) -> void:
