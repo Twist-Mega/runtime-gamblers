@@ -18,6 +18,7 @@ func _ready() -> void:
 	GameState.state_changed.connect(_on_state_changed)
 	Wallet.money_changed.connect(_update_money)
 	resume_button.pressed.connect(_on_resume_button_pressed)
+	quit_button.pressed.connect(_on_quit_button_pressed)
 	_update_money(Wallet.money)
 
 func _on_state_changed(new_state: int) -> void:
@@ -26,6 +27,10 @@ func _on_state_changed(new_state: int) -> void:
 func _on_resume_button_pressed() -> void:
 	GameState.request_state(GameState.State.EXPLORING)
 
+func _on_quit_button_pressed() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/title_screen.tscn")
+	
 #currently can exit menu via pressing the menu button again (z) or through the cancel button (c)
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu"):
