@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Runtime Gamblers"
-run/main_scene="uid://c4a5isx0j3x2k"
+run/main_scene="uid://cyhwoxoqaumff"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameState="*uid://dk0je31xujpep"
 Wallet="*uid://sslr2xyxg1a0"
 DialogueBox="*uid://b23ffqcnaj3n8"
+SaveManager="*uid://bt2wi7nlmugtw"
 
 [display]
 

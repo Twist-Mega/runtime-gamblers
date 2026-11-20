@@ -8,6 +8,23 @@ const MAX_MONEY: int = 9_223_372_036_854_775_807
 var money: int = STARTING_MONEY
 var _applied_transactions: Dictionary = {}
 
+func _ready() -> void:
+	add_to_group("saveable")
+	
+func save_key() -> String:
+	return "wallet"
+	
+func get_save_data() -> Dictionary:
+	return {"money": money}
+	
+func load_save_data(data: Dictionary) -> void:
+	money = int(data.get("money", STARTING_MONEY))
+	money_changed.emit(money)
+
+func reset_to_defaults() -> void:
+	money = STARTING_MONEY
+	money_changed.emit(money)
+
 # Negative amounts spend money; positive amounts credit it.
 # A successful ID can be retried with the same amount without applying it twice.
 func apply_transaction(transaction_id: String, delta: int) -> bool:
