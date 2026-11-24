@@ -13,12 +13,14 @@ var pending_overwrite := -1
 @onready var slot_panel: Control = $SlotPanel
 @onready var slot_buttons: Array = $SlotPanel/SlotList.get_children()
 @onready var slot_back_button: Button = $SlotPanel/SlotBackButton
+@onready var quit_game_button: Button = $Menu/QuitButton
 
 func _ready() -> void:
 	slot_panel.visible = false
 	load_game_button.disabled = not SaveManager.any_save_exists()
 
 	new_game_button.pressed.connect(_on_new_game_pressed)
+	quit_game_button.pressed.connect(_on_quit_game_pressed)
 	load_game_button.pressed.connect(_on_load_game_pressed)
 	slot_back_button.pressed.connect(_close_slots)
 	for i in slot_buttons.size():
@@ -33,6 +35,11 @@ func _on_new_game_pressed() -> void:
 
 func _on_load_game_pressed() -> void:
 	_open_slots(Mode.LOAD)
+
+func _on_quit_game_pressed() -> void:
+	get_tree().quit()
+
+
 # --- Slot picker ---
 
 func _open_slots(new_mode: Mode) -> void:

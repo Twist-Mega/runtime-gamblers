@@ -32,6 +32,13 @@ offset_top = 147.93277
 offset_right = 385.49768
 offset_bottom = 209.64706
 
+[node name="QuitButton" type="Button" parent="Menu" unique_id=519321168]
+offset_left = 335.17633
+offset_top = 235.05878
+offset_right = 547.24493
+offset_bottom = 304.03357
+text = "Quit Game"
+
 [node name="SlotPanel" type="ColorRect" parent="." unique_id=890484976]
 visible = false
 layout_mode = 0
