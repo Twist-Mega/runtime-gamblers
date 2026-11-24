@@ -32,6 +32,7 @@ func _on_resume_button_pressed() -> void:
 	GameState.request_state(GameState.State.EXPLORING)
 	
 func _on_quit_button_pressed() -> void:
+	get_tree().paused = false
 	get_tree().change_scene_to_file(TITLE_PATH)
 
 #currently can exit menu via pressing the menu button again (z) or through the cancel button (c)

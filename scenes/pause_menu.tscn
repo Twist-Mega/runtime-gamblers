@@ -74,8 +74,11 @@ theme = SubResource("Theme_7l7mv")
 
 [node name="Center" type="CenterContainer" parent="Window" unique_id=484371382]
 layout_mode = 0
-offset_right = 220.0
-offset_bottom = 148.0
+offset_left = 103.0
+offset_top = 31.0
+offset_right = 323.0
+offset_bottom = 263.0
+scale = Vector2(0.5, 0.5)
 
 [node name="Panel" type="PanelContainer" parent="Window/Center" unique_id=102829648]
 custom_minimum_size = Vector2(112, 120)
@@ -131,7 +134,7 @@ size_flags_horizontal = 4
 theme_override_styles/normal = SubResource("StyleBoxTexture_ryrqj")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_v7osp")
 theme_override_styles/hover = SubResource("StyleBoxTexture_85aed")
-text = "Quit"
+text = "Quit to Title"
 
 [node name="Wallet" type="PanelContainer" parent="Window/Center/Panel/Items" unique_id=922243185]
 custom_minimum_size = Vector2(64, 16)

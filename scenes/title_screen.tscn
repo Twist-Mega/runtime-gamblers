@@ -32,32 +32,6 @@ offset_top = 147.93277
 offset_right = 385.49768
 offset_bottom = 209.64706
 
-[node name="SettingsPanel" type="ColorRect" parent="." unique_id=760557627]
-visible = false
-layout_mode = 0
-offset_left = 16.0
-offset_top = 12.0
-offset_right = 300.0
-offset_bottom = 162.0
-color = Color(1, 0.51, 0.51, 1)
-
-[node name="Label" type="Label" parent="SettingsPanel" unique_id=713670847]
-layout_mode = 0
-offset_left = 52.0
-offset_top = 42.0
-offset_right = 244.0
-offset_bottom = 77.0
-text = "Settings 
-coming soon!"
-
-[node name="BackButton" type="Button" parent="SettingsPanel" unique_id=1182993759]
-layout_mode = 0
-offset_left = 112.0
-offset_top = 93.0
-offset_right = 172.0
-offset_bottom = 122.0
-text = "<-"
-
 [node name="SlotPanel" type="ColorRect" parent="." unique_id=890484976]
 visible = false
 layout_mode = 0

@@ -10,21 +10,16 @@ var pending_overwrite := -1
 @onready var new_game_button: Button = $Menu/NewGameButton
 @onready var load_game_button: Button = $Menu/LoadGameButton
 @onready var settings_button: Button = $Menu/SettingsButton
-@onready var settings_panel: Control = $SettingsPanel
-@onready var back_button: Button = $SettingsPanel/BackButton
 @onready var slot_panel: Control = $SlotPanel
 @onready var slot_buttons: Array = $SlotPanel/SlotList.get_children()
 @onready var slot_back_button: Button = $SlotPanel/SlotBackButton
 
 func _ready() -> void:
-	settings_panel.visible = false
 	slot_panel.visible = false
 	load_game_button.disabled = not SaveManager.any_save_exists()
 
 	new_game_button.pressed.connect(_on_new_game_pressed)
 	load_game_button.pressed.connect(_on_load_game_pressed)
-	settings_button.pressed.connect(_on_settings_pressed)
-	back_button.pressed.connect(_on_back_pressed)
 	slot_back_button.pressed.connect(_close_slots)
 	for i in slot_buttons.size():
 		slot_buttons[i].pressed.connect(_on_slot_pressed.bind(i + 1))
@@ -38,15 +33,6 @@ func _on_new_game_pressed() -> void:
 
 func _on_load_game_pressed() -> void:
 	_open_slots(Mode.LOAD)
-
-func _on_settings_pressed() -> void:
-	settings_panel.visible = true
-	back_button.grab_focus()
-
-func _on_back_pressed() -> void:
-	settings_panel.visible = false
-	settings_button.grab_focus()
-
 # --- Slot picker ---
 
 func _open_slots(new_mode: Mode) -> void:
@@ -93,9 +79,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if slot_panel.visible:
 		_close_slots()
-		get_viewport().set_input_as_handled()
-	elif settings_panel.visible:
-		_on_back_pressed()
 		get_viewport().set_input_as_handled()
 
 func _start_game() -> void:
