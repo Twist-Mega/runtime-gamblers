@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const TITLE_PATH := 'res://scenes/title_screen.tscn'
+
 #for displaying money in pause menu
 @onready var money_label: Label = %MoneyLabel
 @onready var resume_button: Button = %ResumeButton
@@ -17,14 +19,20 @@ func _ready() -> void:
 	visible = false
 	GameState.state_changed.connect(_on_state_changed)
 	Wallet.money_changed.connect(_update_money)
+	#resume button working 11/23
 	resume_button.pressed.connect(_on_resume_button_pressed)
+	#Wallet updating correctly 11/23
 	_update_money(Wallet.money)
+	quit_button.pressed.connect(_on_quit_button_pressed)
 
 func _on_state_changed(new_state: int) -> void:
 	visible = (new_state == GameState.State.MENU)
 
 func _on_resume_button_pressed() -> void:
 	GameState.request_state(GameState.State.EXPLORING)
+	
+func _on_quit_button_pressed() -> void:
+	get_tree().change_scene_to_file(TITLE_PATH)
 
 #currently can exit menu via pressing the menu button again (z) or through the cancel button (c)
 func _unhandled_input(event: InputEvent) -> void:
