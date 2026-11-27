@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://cy8a6b60i76go"]
+
+[ext_resource type="Script" uid="uid://bvwl1v1k07mxa" path="res://scripts/save_load_screen.gd" id="1_ne2mo"]
+[ext_resource type="FontFile" uid="uid://cccpkref0tdc" path="res://assets/fonts/(pixel font)prstartk.ttf" id="2_qdnp6"]
+[ext_resource type="FontFile" uid="uid://b4rudpb08fwup" path="res://assets/fonts/Tiny5-Regular.ttf" id="3_e81pw"]
+
+[sub_resource type="Theme" id="Theme_cjbcc"]
+
+[node name="SaveLoadScreen" type="Control" unique_id=451825691]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ne2mo")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=776601542]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -1.0
+offset_right = 320.0
+offset_bottom = 180.0
+color = Color(0.17254902, 0.33333334, 0.18039216, 1)
+
+[node name="Title" type="Label" parent="ColorRect" unique_id=591355409]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 14.0
+offset_right = 328.0
+offset_bottom = 30.0
+theme = SubResource("Theme_cjbcc")
+theme_override_fonts/font = ExtResource("2_qdnp6")
+text = "Choose a Save Slot: "
+
+[node name="SlotList" type="VBoxContainer" parent="ColorRect" unique_id=586275601]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 40.0
+offset_right = 293.0
+offset_bottom = 150.0
+
+[node name="SaveSlot1" type="Button" parent="ColorRect/SlotList" unique_id=1077491931]
+layout_mode = 2
+
+[node name="SaveSlot2" type="Button" parent="ColorRect/SlotList" unique_id=819908098]
+layout_mode = 2
+
+[node name="SaveSlot3" type="Button" parent="ColorRect/SlotList" unique_id=197451470]
+layout_mode = 2
+
+[node name="SaveSlot4" type="Button" parent="ColorRect/SlotList" unique_id=15369409]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ColorRect" unique_id=1514123356]
+layout_mode = 0
+offset_left = 99.0
+offset_top = 154.0
+offset_right = 387.0
+offset_bottom = 177.0
+theme_override_fonts/font = ExtResource("3_e81pw")
+text = "Press C to Exit..."

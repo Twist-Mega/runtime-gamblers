@@ -1,4 +1,4 @@
-extends Node
+extends Node	
 
 const SLOT_COUNT := 4
 const SAVE_VERSION := 1
@@ -70,3 +70,7 @@ func _read_slot(slot: int) -> Dictionary:
 		push_error("SaveManager: save file is corrupt")
 		return {}
 	return parsed
+	
+func save_to_slot(slot: int) -> bool:
+	current_slot = slot
+	return save_game()

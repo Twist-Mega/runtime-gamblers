@@ -5,6 +5,7 @@
 [ext_resource type="FontFile" uid="uid://b4rudpb08fwup" path="res://assets/fonts/Tiny5-Regular.ttf" id="2_v4r4p"]
 [ext_resource type="Texture2D" uid="uid://vjxw2mp7jocc" path="res://assets/ui/ui_wallet_frame.png" id="3_kukqi"]
 [ext_resource type="Texture2D" uid="uid://ce37c5nvt7gh2" path="res://assets/ui/ui_chip_icon.png" id="5_7l7mv"]
+[ext_resource type="PackedScene" uid="uid://cy8a6b60i76go" path="res://scenes/save_load_screen.tscn" id="6_v4r4p"]
 
 [sub_resource type="Theme" id="Theme_7l7mv"]
 default_font = ExtResource("2_v4r4p")
@@ -159,3 +160,7 @@ layout_mode = 2
 theme = SubResource("Theme_v4r4p")
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="SaveLoadScreen" parent="." unique_id=451825691 instance=ExtResource("6_v4r4p")]
+unique_name_in_owner = true
+visible = false
