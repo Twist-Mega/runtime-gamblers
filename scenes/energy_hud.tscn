@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://8tafccn6m7je"]
+
+[ext_resource type="Texture2D" uid="uid://cfn7gs8ndlcwm" path="res://assets/ui/ui_energy_frame.png" id="1_finue"]
+[ext_resource type="Texture2D" uid="uid://cjrb1far1i6o2" path="res://assets/ui/ui_energy_fill.png" id="2_0dgbs"]
+[ext_resource type="Texture2D" uid="uid://bif8clo2v4isa" path="res://art_source/ui/ui_energy_icon.png" id="3_0dgbs"]
+
+[node name="EnergyHUD" type="CanvasLayer" unique_id=44177162]
+layer = 5
+
+[node name="Bar" type="TextureProgressBar" parent="." unique_id=778537046]
+texture_filter = 1
+offset_left = 18.0
+offset_top = 4.0
+offset_right = 74.0
+offset_bottom = 44.0
+value = 100.0
+texture_under = ExtResource("1_finue")
+texture_progress = ExtResource("2_0dgbs")
+texture_progress_offset = Vector2(2, 2)
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1201185677]
+texture_filter = 1
+offset_left = 6.0
+offset_top = 1.35
+offset_right = 21.0
+offset_bottom = 17.35
+texture = ExtResource("3_0dgbs")
