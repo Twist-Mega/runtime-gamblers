@@ -54,6 +54,10 @@ func load_game(slot: int) -> bool:
 func get_slot_info(slot: int) -> Dictionary:
 	return _read_slot(slot).get("meta", {})
 
+func get_slot_data(slot: int, system_key: String) -> Dictionary:
+	var systems: Dictionary = _read_slot(slot).get("systems", {})
+	return systems.get(system_key, {})
+
 func delete_slot(slot: int) -> void:
 	if has_save(slot):
 		DirAccess.remove_absolute(slot_path(slot))

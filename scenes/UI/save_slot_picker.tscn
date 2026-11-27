@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://bgkylm08fdpbe"]
+[gd_scene format=3 uid="uid://dm82h6reiuemx"]
+
+[ext_resource type="PackedScene" uid="uid://7lgqwv58qko8" path="res://scenes/UI/save_slot_button.tscn" id="1_vlnw0"]
 
 [node name="SaveSlotPicker" type="Node2D" unique_id=2040992932]
 
@@ -26,16 +28,16 @@ offset_right = 287.0
 offset_bottom = 143.0
 alignment = 1
 
-[node name="Slot1Button" type="Button" parent="SlotPicker/SlotList" unique_id=1890049780]
+[node name="SaveSlotButton" parent="SlotPicker/SlotList" unique_id=252872736 instance=ExtResource("1_vlnw0")]
 layout_mode = 2
 
-[node name="Slot2Button" type="Button" parent="SlotPicker/SlotList" unique_id=1931117875]
+[node name="SaveSlotButton2" parent="SlotPicker/SlotList" unique_id=1181749441 instance=ExtResource("1_vlnw0")]
 layout_mode = 2
 
-[node name="Slot3Button" type="Button" parent="SlotPicker/SlotList" unique_id=208046326]
+[node name="SaveSlotButton3" parent="SlotPicker/SlotList" unique_id=1531425368 instance=ExtResource("1_vlnw0")]
 layout_mode = 2
 
-[node name="Slot4Button" type="Button" parent="SlotPicker/SlotList" unique_id=458036636]
+[node name="SaveSlotButton4" parent="SlotPicker/SlotList" unique_id=1998904056 instance=ExtResource("1_vlnw0")]
 layout_mode = 2
 
 [node name="Label2" type="Label" parent="SlotPicker" unique_id=1329905574]

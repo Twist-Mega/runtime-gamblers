@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-const TITLE_PATH := 'res://scenes/title_screen.tscn'
+const TITLE_PATH := 'res://scenes/UI/title_screen.tscn'
 
 #for displaying money in pause menu
 @onready var money_label: Label = %MoneyLabel

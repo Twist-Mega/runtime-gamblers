@@ -28,14 +28,15 @@ func open(new_mode: Mode) -> void:
 	var first_enabled: Button = null
 	for i in slot_buttons.size():
 		var slot := i + 1
-		var button: Button = slot_buttons[i]
+		var button: SaveSlotButton = slot_buttons[i]
 		if SaveManager.has_save(slot):
 			var saved_at: String = SaveManager.get_slot_info(slot).get("saved_at", "")
-			button.text = "Slot %d  %s" % [slot, saved_at.left(16)]
-			button.disabled = false
+			var wallet_data: Dictionary = SaveManager.get_slot_data(slot, "wallet")
+			button.show_save(int(wallet_data.get("money", 0)), saved_at)
+			button.set_available(true)
 		else:
-			button.text = "Slot %d  Empty" % slot
-			button.disabled = (mode == Mode.LOAD)
+			button.show_empty()
+			button.set_available(mode != Mode.LOAD)
 		if first_enabled == null and not button.disabled:
 			first_enabled = button
 
@@ -49,11 +50,11 @@ func close() -> void:
 	pending_overwrite = -1
 		
 func _on_slot_pressed(slot: int) -> void:
-	var needs_confirm := (mode != Mode.LOAD and SaveManager.has_save(slot) 
+	var needs_confirm: bool = (mode != Mode.LOAD and SaveManager.has_save(slot) 
 						and pending_overwrite != slot)
 	if needs_confirm:
 		pending_overwrite = slot
-		slot_buttons[slot - 1].text = "Overwrite? Press again"
+		slot_buttons[slot - 1].show_overwrite_prompt()
 		return
 	close()
 	slot_chosen.emit(slot, mode)

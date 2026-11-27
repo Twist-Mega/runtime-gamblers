@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://bgfr1t8c4vtjr"]
 
-[ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/pause/pause_menu.gd" id="1_5d2l8"]
+[ext_resource type="Script" uid="uid://dat2h04cgflrm" path="res://scripts/UI_scripts/pause_menu.gd" id="1_5d2l8"]
 [ext_resource type="Texture2D" uid="uid://b4xw10ix5b3uo" path="res://assets/ui/ui_panel.png" id="1_myx47"]
 [ext_resource type="FontFile" uid="uid://b4rudpb08fwup" path="res://assets/fonts/Tiny5-Regular.ttf" id="2_v4r4p"]
 [ext_resource type="Texture2D" uid="uid://vjxw2mp7jocc" path="res://assets/ui/ui_wallet_frame.png" id="3_kukqi"]
 [ext_resource type="Texture2D" uid="uid://ce37c5nvt7gh2" path="res://assets/ui/ui_chip_icon.png" id="5_7l7mv"]
+[ext_resource type="PackedScene" uid="uid://cy8a6b60i76go" path="res://scenes/UI/save_load_screen.tscn" id="6_sipkl"]
 
 [sub_resource type="Theme" id="Theme_7l7mv"]
 default_font = ExtResource("2_v4r4p")
@@ -176,3 +177,6 @@ offset_transform_position = Vector2(-11, 0)
 theme = SubResource("Theme_v4r4p")
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="SaveLoadScreen" parent="." unique_id=451825691 instance=ExtResource("6_sipkl")]
+unique_name_in_owner = true

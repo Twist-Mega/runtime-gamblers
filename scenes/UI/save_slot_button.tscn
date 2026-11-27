@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://7lgqwv58qko8"]
+
+[ext_resource type="FontFile" uid="uid://b4rudpb08fwup" path="res://assets/fonts/Tiny5-Regular.ttf" id="1_8y25e"]
+[ext_resource type="Script" uid="uid://bekk1n17dollr" path="res://scripts/UI_scripts/save_slot_button.gd" id="1_c46mp"]
+
+[node name="SaveSlotButton" type="Button" unique_id=252872736]
+custom_minimum_size = Vector2(100, 25)
+theme_override_font_sizes/font_size = 8
+script = ExtResource("1_c46mp")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2121478071]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MoneyLabel" type="Label" parent="HBoxContainer" unique_id=234494790]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1_8y25e")
+
+[node name="DateLabel" type="Label" parent="HBoxContainer" unique_id=1183849932]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_8y25e")
+theme_override_font_sizes/font_size = 16
