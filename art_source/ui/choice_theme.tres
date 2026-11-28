@@ -1,0 +1,20 @@
+[gd_resource type="Theme" format=3 uid="uid://sbiijtfrelrd"]
+
+[ext_resource type="FontFile" uid="uid://cccpkref0tdc" path="res://assets/fonts/(pixel font)prstartk.ttf" id="1_anhsk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lo8j3"]
+bg_color = Color(0.6638241, 0.6638241, 0.6638241, 0.30980393)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rnncc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0dnmw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icqw2"]
+
+[resource]
+default_font = ExtResource("1_anhsk")
+default_font_size = 10
+Button/styles/focus = SubResource("StyleBoxFlat_lo8j3")
+Button/styles/hover = SubResource("StyleBoxEmpty_rnncc")
+Button/styles/normal = SubResource("StyleBoxEmpty_0dnmw")
+Button/styles/pressed = SubResource("StyleBoxEmpty_icqw2")

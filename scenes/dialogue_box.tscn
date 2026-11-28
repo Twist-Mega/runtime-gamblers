@@ -4,6 +4,8 @@
 [ext_resource type="FontFile" uid="uid://cccpkref0tdc" path="res://assets/fonts/(pixel font)prstartk.ttf" id="1_rc1id"]
 [ext_resource type="Texture2D" uid="uid://vjxw2mp7jocc" path="res://assets/ui/ui_wallet_frame.png" id="2_hvmm2"]
 [ext_resource type="Texture2D" uid="uid://m4ofejpfbb8t" path="res://assets/ui/ui_dialogue_arrow.png" id="4_p0wdv"]
+[ext_resource type="Texture2D" uid="uid://dgoqoxfpjcdxn" path="res://art_source/ui/ui_wallet_frame.png" id="5_pehjr"]
+[ext_resource type="Theme" uid="uid://sbiijtfrelrd" path="res://art_source/ui/choice_theme.tres" id="6_c26ww"]
 
 [node name="DialogueBox" type="CanvasLayer" unique_id=102489367]
 script = ExtResource("1_fu8b5")
@@ -51,3 +53,33 @@ layout_mode = 2
 size_flags_vertical = 8
 texture = ExtResource("4_p0wdv")
 stretch_mode = 2
+
+[node name="Choices" type="MarginContainer" parent="." unique_id=635091722]
+unique_name_in_owner = true
+texture_filter = 1
+custom_minimum_size = Vector2(300, 0)
+offset_left = 10.0
+offset_top = 72.0
+offset_right = 310.0
+offset_bottom = 84.0
+
+[node name="Panel" type="NinePatchRect" parent="Choices" unique_id=1201845789]
+layout_mode = 2
+texture = ExtResource("5_pehjr")
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+
+[node name="MarginContainer" type="MarginContainer" parent="Choices" unique_id=995497967]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="ChoiceList" type="VBoxContainer" parent="Choices/MarginContainer" unique_id=870075555]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+theme = ExtResource("6_c26ww")
