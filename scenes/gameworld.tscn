@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://bgfr1t8c4vtjr" path="res://scenes/UI/pause_menu.tscn" id="6_28lvv"]
 [ext_resource type="PackedScene" uid="uid://c1d4mvq5hj6l2" path="res://scenes/security_npc.tscn" id="6_667gv"]
 [ext_resource type="PackedScene" uid="uid://bv67q73lm4rco" path="res://scenes/dealer_npc.tscn" id="12_28lvv"]
+[ext_resource type="Resource" uid="uid://pe1w4t3d7wx6" path="res://dialogue/test_dealer.dialogue" id="12_rv83r"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bpavk"]
 resource_name = "Casino Sheet"
@@ -300,6 +301,7 @@ lines = Array[String](["Ready to play?"])
 [node name="bottomleft_dealer" parent="Characters" unique_id=736679552 instance=ExtResource("12_28lvv")]
 position = Vector2(-86, 31)
 lines = Array[String](["Ready to play?"])
+dialogue = ExtResource("12_rv83r")
 
 [node name="bottomright_dealer" parent="Characters" unique_id=641561517 instance=ExtResource("12_28lvv")]
 position = Vector2(88, 33)

@@ -1,0 +1,9 @@
+~ start
+Dealer: Good evening. Want to play?
+Dealer: The tables are open.
+- Sure thing.
+	Dealer: By all means.
+	=> END
+- Not feeling it.
+	Dealer: As you please.
+	=> END
