@@ -21,6 +21,7 @@ GameState="*uid://dk0je31xujpep"
 Wallet="*uid://sslr2xyxg1a0"
 DialogueBox="*uid://b23ffqcnaj3n8"
 SaveManager="*uid://bt2wi7nlmugtw"
+DialogueManager="*uid://c3rodes2l3gxb"
 
 [display]
 
@@ -35,6 +36,10 @@ window/stretch/scale_mode="integer"
 [dotnet]
 
 project/assembly_name="Runtime Gamblers"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg")
 
 [global_group]
 
@@ -125,6 +130,10 @@ cancel={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":67,"key_label":0,"unicode":99,"location":0,"echo":false,"script":null)
 ]
 }
+
+[internationalization]
+
+locale/translations_pot_files=PackedStringArray("res://dialogue/test.dialogue")
 
 [physics]
 

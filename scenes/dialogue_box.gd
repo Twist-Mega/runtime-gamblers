@@ -7,6 +7,10 @@ const CHAR_READ_RATE = 0.0275
 @onready var text = %Text
 @onready var advance_symbol = %Advance
 
+var dialogue_resource: DialogueResource
+var current_line
+var in_dialogue := false
+
 enum State {
 	READY,
 	READING,
@@ -36,8 +40,11 @@ func _process(_delta: float) -> void:
 				change_state(State.FINISHED)
 		State.FINISHED:
 			if advance_pressed():
-				change_state(State.READY)
-				hide_dialogue()
+				if in_dialogue:
+					_advance_dialogue()
+				else:
+					change_state(State.READY)
+					hide_dialogue()
 
 # True when the player presses a button that skips/advances dialogue
 func advance_pressed() -> bool:
@@ -54,9 +61,15 @@ func start_dialogue(lines: Array[String]) -> void:
 	for line in lines:
 		queue_dialogue(line)
 
+# Start a conversation from a dialogue file using plugin
+func start_dialogue_from_file(resource: DialogueResource, title: String = "start") -> void:
+	dialogue_resource = resource
+	in_dialogue = true
+	await _fetch_line(title)
+
 # True while a conversation is in progress, so NPCs don't retrigger it
 func is_busy() -> bool:
-	return current_state != State.READY or !dialogue_queue.is_empty()
+	return current_state != State.READY or !dialogue_queue.is_empty() or in_dialogue == true
 
 # ----Internal functions
 
@@ -92,3 +105,25 @@ func change_state(next_state):
 			print("Changing state to: State.READING")
 		State.FINISHED:
 			print("Changing state to: State.FINISHED")
+
+func _fetch_line(id: String) -> void:
+	current_line = await dialogue_resource.get_next_dialogue_line(id)
+	if not current_line:
+		_end_dialogue()
+		return
+	queue_dialogue(current_line.text)
+
+func _advance_dialogue() -> void:
+	change_state(State.READY)
+	var next_id: String = current_line.next_id
+	if next_id.is_empty() or next_id.begins_with("END"):
+		_end_dialogue()
+	else:
+		await _fetch_line(next_id)
+
+func _end_dialogue() -> void:
+	in_dialogue = false
+	dialogue_resource = null
+	current_line = null
+	change_state(State.READY)
+	hide_dialogue()
