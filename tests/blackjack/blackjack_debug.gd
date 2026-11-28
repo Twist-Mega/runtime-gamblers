@@ -10,6 +10,7 @@ const WalletPort = preload("res://scripts/blackjack/blackjack_wallet_port.gd")
 const TABLE_ID = "development"
 const DEBUG_VIEW_SIZE = Vector2i(1280, 720)
 const DEAL_MODES = ["Shuffled", "Player blackjack", "Hit to bust", "Push (stand)", "Dealer bust (stand)"]
+const WIN_OUTCOME = ["win", "blackjack"]
 
 @export_range(0, 1000000, 1) var starting_balance: int = 1000
 @export var manage_window_scaling: bool = false
@@ -49,6 +50,8 @@ var _fail_button: Button
 var _fast_forward: bool = false
 var _ai_moves_seen: Dictionary = {}
 var _saved_window_scaling: Dictionary = {}
+
+@onready var win_sfx: AudioStreamPlayer = $WinSFX
 
 
 func _ready() -> void:
@@ -360,6 +363,8 @@ func _play_events(events: Array) -> void:
 			"hand_settled":
 				_show_hand_result(event.result)
 				_log_line(_result_label.text)
+				if event.result.outcome in WIN_OUTCOME:
+					win_sfx.play()
 			"wallet_transaction_pending":
 				_log_line("Wallet return pending. Retry Return is available after playback.")
 			"session_finished":
