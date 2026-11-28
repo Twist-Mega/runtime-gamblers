@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bv67q73lm4rco"]
 
 [ext_resource type="Script" uid="uid://cl2na8kahkv5i" path="res://scenes/dealer_npc.gd" id="1_vn8g1"]
-[ext_resource type="Texture2D" uid="uid://x3q436c4e0os" path="res://art_source/characters/dealer_walk.png" id="2_vn8g1"]
+[ext_resource type="Texture2D" uid="uid://c6rnv4exo1xl7" path="res://art_source/characters/dealer_walk.png" id="2_vn8g1"]
 [ext_resource type="Texture2D" uid="uid://cefuogg1vivgx" path="res://assets/ui/ui_prompt_interact.png" id="3_kx76o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hjhlk"]

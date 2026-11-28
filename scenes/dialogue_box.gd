@@ -43,7 +43,7 @@ func _process(_delta: float) -> void:
 func advance_pressed() -> bool:
 	return Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("interact")
 
-# --- Public API (call these from NPCs/objects) ---
+# ----Public API
 
 # Queue a single line
 func queue_dialogue(next_dialogue):
@@ -58,7 +58,7 @@ func start_dialogue(lines: Array[String]) -> void:
 func is_busy() -> bool:
 	return current_state != State.READY or !dialogue_queue.is_empty()
 
-# --- Internals ---
+# ----Internal functions
 
 func show_dialogue():
 	dialogue_container.show()
