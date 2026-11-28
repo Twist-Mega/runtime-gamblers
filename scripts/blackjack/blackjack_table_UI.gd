@@ -14,10 +14,10 @@ func select_table(table_id: String, stake_amount: int) -> void:
 	selected_stake = stake_amount
 	_show_table_prompt()
 
-
 func _show_table_prompt() -> void:
 	$Label.text = "Blackjack\nStake: %d\n\nPress C to exit" % selected_stake
 	$PlayButton.text = "Play"
+	$PlayButton.grab_focus()
 	$PlayButton.disabled = not Wallet.can_afford(selected_stake)
 
 #listens for state change

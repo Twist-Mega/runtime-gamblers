@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dm82h6reiuemx"]
+
+[ext_resource type="PackedScene" uid="uid://7lgqwv58qko8" path="res://scenes/UI/save_slot_button.tscn" id="1_vlnw0"]
+
+[node name="SaveSlotPicker" type="Node2D" unique_id=2040992932]
+
+[node name="SlotPicker" type="ColorRect" parent="." unique_id=1066762242]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 306.0
+offset_bottom = 169.0
+color = Color(0.32138333, 0.55, 0.31350002, 1)
+
+[node name="Label" type="Label" parent="SlotPicker" unique_id=1235069405]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 318.0
+offset_bottom = 31.0
+scale = Vector2(0.885, 0.885)
+text = "Choose a save slot:"
+
+[node name="SlotList" type="VBoxContainer" parent="SlotPicker" unique_id=1855142373]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 33.0
+offset_right = 287.0
+offset_bottom = 143.0
+alignment = 1
+
+[node name="SaveSlotButton" parent="SlotPicker/SlotList" unique_id=252872736 instance=ExtResource("1_vlnw0")]
+layout_mode = 2
+
+[node name="SaveSlotButton2" parent="SlotPicker/SlotList" unique_id=1181749441 instance=ExtResource("1_vlnw0")]
+layout_mode = 2
+
+[node name="SaveSlotButton3" parent="SlotPicker/SlotList" unique_id=1531425368 instance=ExtResource("1_vlnw0")]
+layout_mode = 2
+
+[node name="SaveSlotButton4" parent="SlotPicker/SlotList" unique_id=1998904056 instance=ExtResource("1_vlnw0")]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="SlotPicker" unique_id=1329905574]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 146.00002
+offset_right = 346.0
+offset_bottom = 162.00002
+scale = Vector2(0.535, 0.535)
+text = "(press c to exit)"

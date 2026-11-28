@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://cyhwoxoqaumff"]
+
+[ext_resource type="Texture2D" uid="uid://duvylttgkoaqq" path="res://assets/RuntimeGamblers.jpg" id="1_fgkus"]
+[ext_resource type="Script" uid="uid://c5dg6ggwoxj47" path="res://scripts/title_screen.gd" id="1_sa3yf"]
+
+[node name="TitleScreen" type="Control" unique_id=513645179]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_sa3yf")
+game_scene_path = "uid://c4a5isx0j3x2k"
+
+[node name="Menu" type="Sprite2D" parent="." unique_id=1899720593]
+position = Vector2(159.75, 89.25)
+scale = Vector2(0.2782118, 0.27546296)
+texture = ExtResource("1_fgkus")
+
+[node name="NewGameButton" type="Button" parent="Menu" unique_id=1065940936]
+offset_left = -462.77692
+offset_top = 133.41177
+offset_right = -221.95319
+offset_bottom = 198.75632
+
+[node name="LoadGameButton" type="Button" parent="Menu" unique_id=1061998454]
+offset_left = -150.06552
+offset_top = 140.67227
+offset_right = 44.03125
+offset_bottom = 209.64706
+
+[node name="SettingsButton" type="Button" parent="Menu" unique_id=1954272467]
+offset_left = 151.86273
+offset_top = 147.93277
+offset_right = 385.49768
+offset_bottom = 209.64706
+
+[node name="QuitButton" type="Button" parent="Menu" unique_id=519321168]
+offset_left = -570.6084
+offset_top = -324.0
+offset_right = -562.6084
+offset_bottom = -316.0
+
+[node name="SlotPanel" type="ColorRect" parent="." unique_id=890484976]
+visible = false
+layout_mode = 0
+offset_left = 12.0
+offset_top = 7.0
+offset_right = 306.0
+offset_bottom = 166.0
+color = Color(0.32138333, 0.55, 0.31350002, 1)
+
+[node name="Label" type="Label" parent="SlotPanel" unique_id=682501196]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 15.0
+offset_right = 564.0
+offset_bottom = 130.0
+text = "Choose a save slot:"
+
+[node name="SlotList" type="VBoxContainer" parent="SlotPanel" unique_id=1188324992]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 29.0
+offset_right = 287.0
+offset_bottom = 140.0
+alignment = 1
+
+[node name="Slot1Button" type="Button" parent="SlotPanel/SlotList" unique_id=866214298]
+layout_mode = 2
+
+[node name="Slot2Button" type="Button" parent="SlotPanel/SlotList" unique_id=18880114]
+layout_mode = 2
+
+[node name="Slot3Button" type="Button" parent="SlotPanel/SlotList" unique_id=1256237204]
+layout_mode = 2
+
+[node name="Slot4Button" type="Button" parent="SlotPanel/SlotList" unique_id=2077363817]
+layout_mode = 2
+
+[node name="SlotBackButton" type="Button" parent="SlotPanel" unique_id=1217487225]
+layout_mode = 0
+offset_left = 107.0
+offset_top = 125.0
+offset_right = 191.0
+offset_bottom = 147.0
+text = "<-"

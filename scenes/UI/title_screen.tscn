@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://cyhwoxoqaumff"]
+
+[ext_resource type="Texture2D" uid="uid://duvylttgkoaqq" path="res://assets/RuntimeGamblers.jpg" id="1_fgkus"]
+[ext_resource type="Script" uid="uid://c5dg6ggwoxj47" path="res://scripts/UI_scripts/title_screen.gd" id="1_sa3yf"]
+[ext_resource type="PackedScene" uid="uid://cy8a6b60i76go" path="res://scenes/UI/save_load_screen.tscn" id="3_wctsj"]
+
+[node name="TitleScreen" type="Control" unique_id=513645179]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_sa3yf")
+game_scene_path = "uid://c4a5isx0j3x2k"
+
+[node name="Menu" type="Sprite2D" parent="." unique_id=1899720593]
+position = Vector2(159.75, 89.25)
+scale = Vector2(0.2782118, 0.27546296)
+texture = ExtResource("1_fgkus")
+
+[node name="NewGameButton" type="Button" parent="Menu" unique_id=1065940936]
+offset_left = -462.77692
+offset_top = 133.41177
+offset_right = -221.95319
+offset_bottom = 198.75632
+
+[node name="LoadGameButton" type="Button" parent="Menu" unique_id=1061998454]
+offset_left = -150.06552
+offset_top = 140.67227
+offset_right = 44.03125
+offset_bottom = 209.64706
+
+[node name="SettingsButton" type="Button" parent="Menu" unique_id=1954272467]
+offset_left = 151.86273
+offset_top = 147.93277
+offset_right = 385.49768
+offset_bottom = 209.64706
+
+[node name="QuitButton" type="Button" parent="Menu" unique_id=1647673250]
+offset_left = 392.68646
+offset_top = 264.10086
+offset_right = 572.7094
+offset_bottom = 311.75974
+text = "Quit Game"
+
+[node name="SaveLoadScreen" parent="." unique_id=451825691 instance=ExtResource("3_wctsj")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
